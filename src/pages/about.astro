@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import { AUTHOR, GITHUB_URL } from '../consts';
+// Edit the prose below freely. This is your page. Keep it in your own voice.
+---
+
+<Base title="About" description={`About ${AUTHOR}`}>
+  <article class="wrap">
+    <p class="eyebrow">About</p>
+    <h1>Hi, I'm {AUTHOR}.</h1>
+
+    <div class="prose">
+      <p>
+        I like running small, reproducible experiments on open-source and
+        open-weight models: how they behave, where they break, and what happens
+        when you probe them on safety as well as everyday tasks. Most of what I
+        publish here runs locally on a laptop, with programmatic grading you can
+        rerun yourself.
+      </p>
+
+      <p>
+        {/* TODO: replace with your own bio. A few things you might add: */}
+        {/* who you are, what you work on, why open models interest you, */}
+        {/* how to reach you (email / social), and anything you want people */}
+        {/* to know before they read the experiments. */}
+        This page is a placeholder. Write whatever you want here: what draws you
+        to open models, what you're currently poking at, and how to get in touch.
+      </p>
+
+      <p>
+        The code for these experiments lives on
+        <a href={GITHUB_URL} rel="me noopener" target="_blank">GitHub</a>.
+        The ideas and experiments are mine, built with AI assistance.
+      </p>
+    </div>
+
+    <p class="back mono"><a href="/">← all experiments</a></p>
+  </article>
+</Base>
+
+<style>
+  h1 { font-size: 2rem; margin: 0.3rem 0 1.2rem; }
+  .back { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+</style>

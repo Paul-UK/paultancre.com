@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, AUTHOR, GITHUB_URL } from '../consts';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = SITE_DESCRIPTION } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2214%22>🧪</text></svg>" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap-wide">
+        <a class="brand" href="/">{SITE_TITLE}</a>
+        <nav>
+          <a href="/">Experiments</a>
+          <a href="/about/">About</a>
+          <a href={GITHUB_URL} rel="me noopener" target="_blank">Code</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap-wide">
+        <p class="disclaimer">
+          The ideas and experiments here are mine, built with AI assistance.
+          Every experiment links to code you can rerun.
+        </p>
+        <p>© {year} {AUTHOR}</p>
+      </div>
+    </footer>
+  </body>
+</html>

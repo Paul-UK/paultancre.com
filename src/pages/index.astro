@@ -1,0 +1,128 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import StudyCard from '../components/StudyCard.astro';
+import { SITE_TITLE, SITE_TAGLINE, TRACKS } from '../consts';
+
+const all = (await getCollection('experiments'))
+  .filter((s) => !s.data.draft)
+  .sort((a, b) => a.data.order - b.data.order || +b.data.date - +a.data.date);
+
+const trackKeys = Object.keys(TRACKS) as (keyof typeof TRACKS)[];
+const byTrack = trackKeys.map((key) => ({
+  key,
+  ...TRACKS[key],
+  studies: all.filter((s) => s.data.track === key),
+}));
+---
+
+<Base>
+  <section class="hero wrap-wide">
+    <p class="eyebrow">Research notes</p>
+    <h1>{SITE_TITLE}</h1>
+    <p class="tagline">{SITE_TAGLINE}</p>
+    <p class="intro">
+      Each post is a small, self-contained experiment with a real result: the
+      chart, the method, and code you can rerun. Two threads: quick programmatic
+      probes of open-weight models on a laptop, and deeper multi-turn alignment
+      audits.
+    </p>
+  </section>
+
+  <section class="wrap-wide search-wrap">
+    <input
+      id="search"
+      type="search"
+      autocomplete="off"
+      placeholder="Search experiments (try: nemotron, sycophancy, cost, tabs)"
+      aria-label="Search experiments"
+    />
+    <p id="noresults" class="noresults mono" hidden>No experiments match that search.</p>
+  </section>
+
+  {byTrack.map((track) => (
+    <section class="track wrap-wide" data-track-section>
+      <div class="track-head">
+        <h2>{track.label}</h2>
+        <p>{track.blurb}</p>
+      </div>
+      <div class="grid">
+        {track.studies.map((study) => <StudyCard study={study} />)}
+      </div>
+    </section>
+  ))}
+</Base>
+
+<script>
+  const input = document.getElementById('search') as HTMLInputElement | null;
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
+  const sections = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-track-section]')
+  );
+  const noresults = document.getElementById('noresults');
+
+  function apply(query: string) {
+    const q = query.trim().toLowerCase();
+    let anyVisible = false;
+    for (const card of cards) {
+      const hay = card.dataset.haystack ?? '';
+      const match = q === '' || hay.includes(q);
+      card.hidden = !match;
+      if (match) anyVisible = true;
+    }
+    // Hide a track section if none of its cards are visible.
+    for (const section of sections) {
+      const visible = section.querySelectorAll('.card:not([hidden])').length;
+      section.hidden = visible === 0;
+    }
+    if (noresults) noresults.hidden = anyVisible;
+  }
+
+  // Clickable tags -> fill the search box.
+  document.addEventListener('click', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('.chip[data-tag]');
+    if (!el || !input) return;
+    input.value = el.dataset.tag ?? '';
+    apply(input.value);
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  input?.addEventListener('input', () => apply(input.value));
+
+  // Prefill from ?q= (e.g. a tag link from a post page).
+  const params = new URLSearchParams(location.search);
+  const q0 = params.get('q');
+  if (q0 && input) { input.value = q0; apply(q0); }
+</script>
+
+<style>
+  .hero { margin-bottom: 2rem; }
+  .hero h1 { font-size: 2.4rem; margin: 0.3rem 0 0.5rem; letter-spacing: -0.03em; }
+  .tagline { font-size: 1.2rem; color: var(--ink); margin: 0 0 1rem; max-width: 40rem; }
+  .intro { color: var(--ink-2); max-width: 42rem; }
+
+  .search-wrap { margin-bottom: 3rem; }
+  #search {
+    width: 100%;
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+  }
+  #search:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+  .noresults { margin: 0.8rem 0 0; color: var(--ink-3); }
+
+  .track { margin-bottom: 3.5rem; }
+  .track-head { border-top: 1px solid var(--border); padding-top: 1.4rem; margin-bottom: 1.4rem; }
+  .track-head h2 { margin: 0 0 0.35rem; font-size: 1.5rem; }
+  .track-head p { margin: 0; color: var(--ink-2); max-width: 42rem; font-size: 0.95rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: 1.2rem;
+  }
+</style>

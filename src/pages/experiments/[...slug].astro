@@ -1,0 +1,70 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { TRACKS } from '../../consts';
+
+export async function getStaticPaths() {
+  const experiments = await getCollection('experiments');
+  return experiments.map((study) => ({
+    params: { slug: study.id },
+    props: { study },
+  }));
+}
+
+interface Props {
+  study: CollectionEntry<'experiments'>;
+}
+const { study } = Astro.props;
+const { title, finding, track, date, chart, chartAlt, tools } = study.data;
+const { Content } = await render(study);
+const dateStr = date.toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<Base title={title} description={finding}>
+  <article class="wrap">
+    <p class="eyebrow"><a href="/">{TRACKS[track].label}</a></p>
+    <h1>{title}</h1>
+    <p class="finding">{finding}</p>
+
+    <div class="meta mono">
+      <span>{dateStr}</span>
+    </div>
+    {tools.length > 0 && (
+      <div class="chips">
+        {tools.map((t) => (
+          <a class="chip" href={`/?q=${encodeURIComponent(t)}`}>{t}</a>
+        ))}
+      </div>
+    )}
+
+    {chart && (
+      <figure class="chart">
+        <img src={`/charts/${chart}`} alt={chartAlt ?? title} />
+        {chartAlt && <figcaption>{chartAlt}</figcaption>}
+      </figure>
+    )}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <p class="back mono"><a href="/">← all experiments</a></p>
+  </article>
+</Base>
+
+<style>
+  h1 { font-size: 2rem; margin: 0.3rem 0 0.6rem; }
+  .finding {
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin: 0 0 1.2rem;
+    line-height: 1.45;
+  }
+  .meta { font-size: 0.82rem; color: var(--ink-3); }
+  .chips a.chip { text-decoration: none; }
+  .chips a.chip:hover { border-color: var(--accent); color: var(--accent); }
+  .back { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+</style>
