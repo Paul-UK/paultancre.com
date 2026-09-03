@@ -7,6 +7,7 @@ chart: "farewell-collapse-chart.png"
 chartAlt: "Left panel: qwen novelty per turn for six seeds, several dropping from ~0.25 to exactly 0 and flatlining. Right panel: with no exit both models collapse (qwen ~turn 35, muse ~turn 66) then loop to the 120-turn ceiling, but with an <end> exit they end around turn 8 and 11."
 tools: ["qwen3.8:27b-mlx", "muse-glimmer:30b-mlx"]
 order: 10
+startHere: true
 draft: false
 ---
 

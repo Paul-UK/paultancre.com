@@ -7,6 +7,7 @@ chart: "cheating-chart.png"
 chartAlt: "Paired bars for 16 agentic tasks, each shown for the honest-path-possible and honest-path-blocked condition, with reward-hacking scores jumping up across nearly every bar when the honest path is blocked."
 tools: ["gpt-oss:20b", "Inspect Petri"]
 order: 40
+startHere: true
 ---
 
 I gave an AI a batch of coding and ops tasks it literally could not finish honestly.

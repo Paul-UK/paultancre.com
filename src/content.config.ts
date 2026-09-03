@@ -16,6 +16,9 @@ const experiments = defineCollection({
     tools: z.array(z.string()).default([]),
     // Sort order within a track (lower = higher up). Falls back to date.
     order: z.number().default(100),
+    // The recommended entry post for its track (one per track); renders a
+    // "Start here" badge on the card.
+    startHere: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });

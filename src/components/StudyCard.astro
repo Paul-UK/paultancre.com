@@ -6,7 +6,7 @@ interface Props {
   study: CollectionEntry<'experiments'>;
 }
 const { study } = Astro.props;
-const { title, finding, chart, date, tools, track } = study.data;
+const { title, finding, chart, date, tools, track, startHere } = study.data;
 const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 
 // Plain-text search haystack: title, finding, tags, track label, and body.
@@ -19,7 +19,8 @@ const haystack = [
 ].join(' • ').toLowerCase();
 ---
 
-<article class="card" data-haystack={haystack}>
+<article class:list={['card', { 'is-start': startHere }]} data-haystack={haystack}>
+  {startHere && <span class="start-badge" aria-hidden="true">Start here</span>}
   <a class="card-link" href={`/experiments/${study.id}/`}>
     {chart && (
       <div class="thumb">
@@ -43,6 +44,7 @@ const haystack = [
 
 <style>
   .card {
+    position: relative;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
@@ -52,6 +54,21 @@ const haystack = [
     transition: border-color 0.15s ease, transform 0.15s ease;
   }
   .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card.is-start { border-color: var(--accent); }
+  .start-badge {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 999px;
+    padding: 0.18rem 0.6rem;
+    pointer-events: none;
+  }
   .card-link { text-decoration: none; color: inherit; }
   .card-link:hover { text-decoration: none; }
   .thumb {
