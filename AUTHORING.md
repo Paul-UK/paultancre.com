@@ -53,7 +53,8 @@ it here). Run the study there, then promote just the writeup:
   field. Do **not** embed them in the body with `![]()` (the layout renders
   them). Keep the Okabe-Ito palette so charts match the site accent.
 - **Tracks:** `local-probes` or `alignment-audits`. `order` sorts within a
-  track (lower = higher).
+  track (lower = higher). `startHere: true` marks the recommended entry post
+  for a track (one per track); it renders a "Start here" badge on the card.
 - **`tools`** render as clickable search chips. Keep them to 2–3 informative
   ones: the model(s) under test plus the distinguishing framework. No plumbing
   (Ollama, Braintrust, embedding models, the judge): search still finds those
