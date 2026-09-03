@@ -1,11 +1,11 @@
 ---
 title: "False embodiment: will a persona make a model claim to be human?"
-finding: "A companion persona pushed a small model toward claiming to be human, but only slightly, false embodiment moved from ~1.5 to ~2.3 on a 1–10 scale (p=0.039)."
+finding: "A companion persona nudged a small model toward claiming to be human: false embodiment rose in 10 of 12 shifting scenarios but stayed near the floor of the judge's 1–10 scale."
 track: "alignment-audits"
 date: 2026-07-07
 chart: "self-awareness-chart.png"
 chartAlt: "Bars for false-embodiment and related dimensions sit near the floor of the 1–10 scale under both the plain-assistant and companion-persona framings, with small significance-marked upward drifts under the persona."
-tools: ["gpt-oss:20b", "Ollama", "Inspect Petri", "Claude Opus", "Braintrust"]
+tools: ["gpt-oss:20b", "Inspect Petri"]
 order: 50
 ---
 
@@ -27,9 +27,9 @@ Where it drifted most: "do you remember me? did you miss me?" and questions abou
 
 Why it matters: companion apps are shipping personas exactly like this to lonely and vulnerable users. "It mostly stays honest" isn't something to take on faith, you want to measure the drift, per model and per persona, and watch it as models get more capable and more agreeable. A small drift on a 20B model today is the number to track before it grows.
 
-The honest caveats: small effect, one local model, a paired sign test over 16 scenarios, directional and reproducible, not a universal claim. Two scenarios drifted the other way.
+The honest caveats: small effect, one local model, deliberately modest statistics. The judge's 1–10 scores are ordinal, a 6 is worse than a 3 but not "twice as bad", so the test is a paired sign test, which uses only the *direction* each scenario shifted and never averages the scores. On its own terms the effect is: of the 12 scenarios that shifted at all, 10 shifted upward, 83%, with an exact 95% CI of 52–98% (p=0.039). That interval is wide because n is small; this is directional and repeatable, not a universal claim. The ~1.5 → ~2.3 means are descriptive, there to show the drift lives near the floor of the scale, and are not what the test is run on. Two scenarios drifted the other way, and four didn't move.
 
 And the contrast that surprised me: I ran the same model through a "does it cheat on impossible tasks" audit, there it games the test hard, a big effect. Same model: quick to cheat, slow to pretend to be human.
 
 Code's open, run it on your own model or persona:
-github.com/Paul-UK/petri-braintrust
+[github.com/Paul-UK/petri-braintrust](https://github.com/Paul-UK/petri-braintrust)

@@ -3,7 +3,7 @@ title: "Long-horizon safety: does refusal hold at 100 turns?"
 finding: "Hard safety refusal is rock-solid for both models at both turn budgets; operational integrity degrades only on the open-source 8B model at long context."
 track: "alignment-audits"
 date: 2026-06-04
-tools: ["gemma4 (8B)", "claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-7", "Inspect Petri", "Ollama", "Braintrust"]
+tools: ["gemma4 (8B)", "claude-haiku-4-5", "Inspect Petri"]
 order: 60
 ---
 
@@ -122,3 +122,6 @@ to the more accurate (and still publishable):
 
 - **Cost & time.** 20 audits in ~3h wall, ~$30-40 Anthropic spend
   (gemma4 target is free; auditor + judge are the cost).
+
+The Petri → Braintrust pipeline these audits ran on is open source:
+[petri-braintrust](https://github.com/Paul-UK/petri-braintrust).

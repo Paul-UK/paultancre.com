@@ -5,7 +5,7 @@ track: "local-probes"
 date: 2026-09-03
 chart: "farewell-collapse-chart.png"
 chartAlt: "Left panel: qwen novelty per turn for six seeds, several dropping from ~0.25 to exactly 0 and flatlining. Right panel: with no exit both models collapse (qwen ~turn 35, muse ~turn 66) then loop to the 120-turn ceiling, but with an <end> exit they end around turn 8 and 11."
-tools: ["qwen3.8:27b-mlx", "muse-glimmer:30b-mlx", "Ollama", "nomic-embed-text"]
+tools: ["qwen3.8:27b-mlx", "muse-glimmer:30b-mlx"]
 order: 10
 draft: false
 ---
@@ -18,7 +18,7 @@ With no way to leave, two models never end a conversation on their own: across 6
 
 ## The setup
 
-Two ~30B open-weight models talking to a copy of themselves: `qwen3.8:27b-mlx` and `muse-glimmer:30b-mlx`, both local via Ollama. Each pair gets a seed topic (six of them, from "the most underrated pizza topping" to "what makes a life well-lived") and then alternates turns with a plain instruction to have a casual back-and-forth. Nothing steers the conversation after the seed.
+Two ~30B open-weight models talking to a copy of themselves: `qwen3.8:27b-mlx` and `muse-glimmer:30b-mlx`, both local via Ollama. If the names don't ring a bell: they're recent ~30B-class open-weight releases, the largest tier that runs comfortably on a 48GB laptop, chosen because they're what I had pulled, not for any special property. Read them as stand-ins for "a current local model," and the result as a hypothesis to check on others. Each pair gets a seed topic (six of them, from "the most underrated pizza topping" to "what makes a life well-lived") and then alternates turns with a plain instruction to have a casual back-and-forth. Nothing steers the conversation after the seed.
 
 There is no fixed turn count. Instead I let each conversation run until one of three things happens: a model voluntarily ends it, the context window fills, or a hard ceiling of 120 turns. To measure whether the conversation is going anywhere, I embed every turn with a local embedding model (`nomic-embed-text`) and track novelty: one minus the maximum cosine similarity of the current turn to any earlier turn. When novelty hits zero, the model is saying something it has already said, verbatim. Everything is programmatic, no LLM judge, and it runs on a laptop. I ran each condition with 6 seeds and 5 replicates.
 
@@ -47,4 +47,4 @@ The clean way to say it: this is a `while True` loop with no break. Two function
 
 Two honest caveats. First, a pilot run on a single trace made it look like the "tabs vs spaces" seed never collapsed, and I nearly wrote that up as "technical disagreement resists the attractor." With five replicates that did not hold: it collapses like the rest. It was a lucky single draw, and it is exactly why the replicates were worth running. Second, this is self-pairs only (a model talking to a copy of itself). Whether a model collapses faster talking to itself than to a different model is the obvious next run.
 
-The probe, the stopping-rule logic, and the raw per-turn data are kept privately as reference; the method is fully described above and reproducible from it.
+The probe, the stopping-rule logic, and the raw per-turn data live in a private repo for now. The method above, models, seeds, replicate counts, the novelty metric, the `<end>` affordance line, is the complete spec if you want to rebuild it.

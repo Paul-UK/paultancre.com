@@ -9,8 +9,9 @@ date: 2026-01-01
 # Chart filename under public/charts/ (omit both lines if there is no chart).
 chart: "SLUG-chart.png"
 chartAlt: "One-sentence description of the chart for screen readers."
-# Models / stack, shown as clickable search chips.
-tools: ["model:tag", "Ollama"]
+# 2-3 informative chips: model(s) under test + distinguishing framework.
+# No plumbing (Ollama, Braintrust, judges) - search finds those via the body.
+tools: ["model:tag"]
 # Lower = higher on the page, within the track.
 order: 10
 # Set true to keep it off the site while drafting.
@@ -23,7 +24,13 @@ HOUSE STYLE (see AUTHORING.md):
 - NO em-dashes. Use commas or colons. En-dashes in numeric ranges are fine.
 - Do NOT embed the chart with ![](): the layout renders it from `chart:` above.
 - Open with a 1-3 sentence lead, then use ## / ### sections.
-- Link the code you can rerun (repo path or URL) somewhere in the body.
+- Be straight about code: link the repo if it's public; if the probe script is
+  private, title the commands section "How it was run" and note the writeup is
+  the complete spec to rebuild from.
+- Local probes: add one line calibrating the models (why these, what tier they
+  stand in for).
+- Judge scores (1-10) are ordinal: direction-based tests, share-of-scenarios
+  effect size with an exact CI, means as descriptive only.
 -->
 
 Lead paragraph: what you did and why, in a sentence or two.

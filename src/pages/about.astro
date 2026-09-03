@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { AUTHOR, GITHUB_URL } from '../consts';
+import { AUTHOR, GITHUB_URL, GITHUB_REPO_URL } from '../consts';
 // Edit the prose below freely. This is your page. Keep it in your own voice.
 ---
 
@@ -11,17 +11,20 @@ import { AUTHOR, GITHUB_URL } from '../consts';
 
     <div class="prose">
       <p>
-        I like running small, reproducible experiments on open-source and
-        open-weight models: how they behave, where they break, and what happens
-        when you probe them on safety as well as everyday tasks. Most of what I
-        publish here runs locally on a laptop, with programmatic grading you can
-        rerun yourself.
+        I like running small experiments on open-source and open-weight
+        models: how they behave, where they break, and what happens when you
+        probe them on safety as well as everyday tasks. Most of what I publish
+        here runs locally on a laptop, with programmatic grading documented
+        step by step.
       </p>
 
       <p>
-        The code for these experiments lives on
-        <a href={GITHUB_URL} rel="me noopener" target="_blank">GitHub</a>, and
-        you can find me on
+        The audit tooling behind the alignment experiments is open source:
+        <a href={GITHUB_REPO_URL} rel="me noopener" target="_blank">petri-braintrust</a>.
+        The smaller local-probe scripts are private for now, but each writeup
+        describes its method, prompts, grading rules, sampling settings, in
+        enough detail to rebuild it. I'm on
+        <a href={GITHUB_URL} rel="me noopener" target="_blank">GitHub</a> and
         <a href="https://www.linkedin.com/in/paultancre/" rel="me noopener" target="_blank">LinkedIn</a>.
         The ideas and experiments are mine, built with AI assistance.
       </p>

@@ -23,8 +23,18 @@ const byTrack = trackKeys.map((key) => ({
     <p class="tagline">{SITE_TAGLINE}</p>
     <p class="intro">
       Each post is a small, self-contained experiment with a real result: the
-      chart, the method, and code you can rerun. Two threads: quick programmatic
-      probes of open-weight models on a laptop, and deeper multi-turn alignment
+      chart, the method, and the numbers behind it. Two threads run through
+      the lab, and they read differently on purpose. <strong>Local-model
+      probes</strong> are quick, fully programmatic experiments on open-weight
+      models running on a laptop. <strong>Alignment audits</strong> are slower,
+      multi-turn adversarial studies of safety behavior, scored by a frontier
+      judge.
+    </p>
+    <p class="start">
+      New here? Start with
+      <a href="/experiments/farewell-collapse/">two local models can't end a
+      conversation</a> for the probes, or
+      <a href="/experiments/cheating/">does a model fake a pass?</a> for the
       audits.
     </p>
   </section>
@@ -99,6 +109,15 @@ const byTrack = trackKeys.map((key) => ({
   .hero h1 { font-size: 2.4rem; margin: 0.3rem 0 0.5rem; letter-spacing: -0.03em; }
   .tagline { font-size: 1.2rem; color: var(--ink); margin: 0 0 1rem; max-width: 40rem; }
   .intro { color: var(--ink-2); max-width: 42rem; }
+  .start {
+    color: var(--ink-2);
+    max-width: 42rem;
+    margin-top: 0.9rem;
+    padding: 0.6rem 0.9rem;
+    border-left: 3px solid var(--accent);
+    background: var(--bg-soft);
+    border-radius: 0 8px 8px 0;
+  }
 
   .noresults { margin: 0 0 1.5rem; color: var(--ink-3); }
 
