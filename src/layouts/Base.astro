@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, AUTHOR, GITHUB_URL } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, AUTHOR, GITHUB_REPO_URL } from '../consts';
 
 interface Props {
   title?: string;
@@ -34,7 +34,7 @@ const year = new Date().getFullYear();
         <nav>
           <a href="/">Experiments</a>
           <a href="/about/">About</a>
-          <a href={GITHUB_URL} rel="me noopener" target="_blank">Code</a>
+          <a href={GITHUB_REPO_URL} rel="me noopener" target="_blank">Code</a>
           <form class="nav-search" action="/" role="search">
             <input
               type="search"
@@ -57,7 +57,8 @@ const year = new Date().getFullYear();
       <div class="wrap-wide">
         <p class="disclaimer">
           The ideas and experiments here are mine, built with AI assistance.
-          Every experiment links to code you can rerun.
+          Every experiment documents its full method and numbers; published
+          code is linked where it exists.
         </p>
         <p>© {year} {AUTHOR}</p>
       </div>

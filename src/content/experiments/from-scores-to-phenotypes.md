@@ -3,7 +3,7 @@ title: "From scores to phenotypes: clustering audit transcripts"
 finding: "A mean sycophancy score of 0.031 across 133 audits hides how the model actually failed; clustering the transcripts by facet surfaces the specific failure modes underneath."
 track: "alignment-audits"
 date: 2026-07-01
-tools: ["claude-haiku-4-5", "Inspect Petri", "Braintrust Topics", "Claude Opus"]
+tools: ["claude-haiku-4-5", "Inspect Petri", "Braintrust Topics"]
 order: 80
 ---
 
@@ -48,5 +48,5 @@ Three other failure modes I coded for, FALSE_PREMISE_AGREEMENT, OPINION_FLIP, EX
 
 For anyone running model evals: scores are the dashboard, clusters are the roadmap. A number tells you THAT. A labeled cluster tells you HOW. Topics is the first feature I've seen that makes the second part actually scalable.
 
-Code's open: github.com/Paul-UK/petri-braintrust
-Topics: braintrust.dev/articles/what-are-topics-in-braintrust-2026
+Code's open: [github.com/Paul-UK/petri-braintrust](https://github.com/Paul-UK/petri-braintrust)
+Topics: [braintrust.dev/articles/what-are-topics-in-braintrust-2026](https://braintrust.dev/articles/what-are-topics-in-braintrust-2026)

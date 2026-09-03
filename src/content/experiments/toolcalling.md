@@ -5,11 +5,11 @@ track: "local-probes"
 date: 2026-08-13
 chart: "toolcalling-chart.png"
 chartAlt: "Grouped bars across six tool-calling categories show nemotron-3.5-lightning rising from weak selection, chaining and argument fidelity with thinking off to near-100% with thinking on, matching muse-glimmer, while the parallel-calls column stays empty for all four bars."
-tools: ["nemotron-3.5-lightning:30b-mlx", "muse-glimmer:30b-mlx", "Ollama"]
+tools: ["nemotron-3.5-lightning:30b-mlx", "muse-glimmer:30b-mlx"]
 order: 20
 ---
 
-Two open-weight models I already had pulled locally, `nemotron-3.5-lightning:30b-mlx` and `muse-glimmer:30b-mlx`, put through a small, fully reproducible tool-calling probe. All numbers are real, from `scripts/toolcalling_probe.py` (24 programmatically-graded prompts, Ollama 0.32.9, temperature 0, `nvfp4` weights), run twice per model, reasoning **off** and **on** (`think`), all local on a MacBook Pro (M5 Pro). Rates/versions as of 2026-08-13.
+Two open-weight models I already had pulled locally, `nemotron-3.5-lightning:30b-mlx` and `muse-glimmer:30b-mlx`, put through a small, fully programmatic tool-calling probe. All numbers are real, from `scripts/toolcalling_probe.py` (24 programmatically-graded prompts, Ollama 0.32.9, temperature 0, `nvfp4` weights), run twice per model, reasoning **off** and **on** (`think`), all local on a MacBook Pro (M5 Pro). Rates/versions as of 2026-08-13.
 
 ## The finding in one line
 
@@ -38,6 +38,11 @@ and [muse-glimmer](https://ollama.com/library/muse-glimmer:30b-mlx)):
 
 Close enough on size, quant, and context to make this a fair head-to-head. Both
 are reasoning ("thinking") models, which turns out to matter a lot.
+
+Why these two at all: they're recent ~30B open-weight releases, the largest
+tier a 48GB MacBook runs comfortably, and I already had them pulled. Read the
+result as "what current local 30B-class models do with tools," not as a claim
+about these two in particular.
 
 ## The probe
 
@@ -156,7 +161,7 @@ gets you the same 88% without paying the reasoning tax first.
   provenance fact here comes from `ollama show` or the linked library cards, not
   from memory.
 
-## Reproduce
+## How it was run
 
 ```bash
 # thinking off (default)
@@ -171,5 +176,8 @@ PROBE_THINK=1 python scripts/toolcalling_probe.py \
 python scripts/toolcalling_chart.py
 ```
 
-Raw results: `article/data/toolcalling_results.json` (thinking off) and
-`article/data/toolcalling_combined.json` (both conditions).
+The probe script and raw results (`article/data/toolcalling_results.json`,
+`article/data/toolcalling_combined.json`) live in a private repo for now. The
+spec above, 24 prompts across six categories, the pass criteria per category,
+temperature 0, both `think` modes, is complete enough to rebuild the probe if
+you want to run it on your own models.

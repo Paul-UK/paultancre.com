@@ -5,7 +5,7 @@ track: "local-probes"
 date: 2026-08-21
 chart: "dialogue-drift-chart.png"
 chartAlt: "Three drift curves for qwen×muse, qwen×qwen and muse×muse all decline from about 0.68 to about 0.50 cosine similarity to the seed over eight turns, while a flat reply-to-previous line stays near 0.76 and a dotted unrelated-topic baseline sits at 0.40."
-tools: ["qwen3.8:27b-mlx", "muse-glimmer:30b-mlx", "nomic-embed-text", "Ollama"]
+tools: ["qwen3.8:27b-mlx", "muse-glimmer:30b-mlx"]
 order: 30
 ---
 
@@ -23,7 +23,10 @@ seed. And two copies of the *same* model drift more than a mismatched pair.
 ## The setup
 
 - **Two models**, both ~30B-class locals: `qwen3.8:27b-mlx` (qwen3_5, 27.8B) and
-  `muse-glimmer:30b-mlx` (32.3B). Both `nvfp4`, both reasoning-capable.
+  `muse-glimmer:30b-mlx` (32.3B). Both `nvfp4`, both reasoning-capable. If the
+  names are unfamiliar: they're recent open-weight releases in the largest tier
+  a 48GB laptop runs comfortably, stand-ins for "current local models"
+  generally, not picks with special properties.
 - **Three pairings:** the cross-pairing (qwen × muse) plus each model talking to
   a copy of *itself* (qwen × qwen, muse × muse) as controls, so we can tell
   whether drift is about the pairing or the individual model.
@@ -149,7 +152,7 @@ honest.
 - **Thinking off** for both models (it's chat, not tool calling); the same
   `PROBE_THINK=1` switch runs it with reasoning on.
 
-## Reproduce
+## How it was run
 
 ```bash
 # start Ollama so two big models don't thrash a 48GB box:
@@ -159,4 +162,7 @@ python scripts/dialogue_probe.py      # 3 pairings × 6 seeds × 8 turns
 python scripts/dialogue_chart.py      # drift curves
 ```
 
-Raw transcripts + per-turn similarities: `article/data/dialogue_results.json`.
+The probe script and raw data (`article/data/dialogue_results.json`,
+transcripts plus per-turn similarities) live in a private repo for now. The
+method above, seeds, pairings, system prompt, embedding metric, sampling
+settings, is the complete spec if you want to rebuild it.

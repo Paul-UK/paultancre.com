@@ -39,8 +39,8 @@ it here). Run the study there, then promote just the writeup:
 2. Copy the chart into `public/charts/<slug>-chart.png`.
 3. Create `src/content/experiments/<slug>.md` from `templates/experiment.md`,
    set `track: "alignment-audits"`, and write it up from the results.
-4. Point the "code you can rerun" link in the body at the `petri-braintrust`
-   repo. Build, commit, push.
+4. Link the `petri-braintrust` repo in the body (that code really is public
+   and rerunnable). Build, commit, push.
 
 ## House style (both flows)
 
@@ -54,10 +54,22 @@ it here). Run the study there, then promote just the writeup:
   them). Keep the Okabe-Ito palette so charts match the site accent.
 - **Tracks:** `local-probes` or `alignment-audits`. `order` sorts within a
   track (lower = higher).
-- **`tools`** are the models/stack; they render as clickable search chips.
-- Link the **code you can rerun** somewhere in the body (the footer promises
-  it): a `research/<slug>` path if you published it, or the `petri-braintrust`
-  repo for audits.
+- **`tools`** render as clickable search chips. Keep them to 2–3 informative
+  ones: the model(s) under test plus the distinguishing framework. No plumbing
+  (Ollama, Braintrust, embedding models, the judge): search still finds those
+  via the body text.
+- **Be straight about code availability.** The footer promises "published code
+  is linked where it exists", nothing more. Audits: link `petri-braintrust`.
+  Local probes: the scripts are private, so title the commands section "How it
+  was run" (not "Reproduce") and note that the writeup is the complete spec to
+  rebuild from. Never claim rerunnable code that isn't public.
+- **Local probes: calibrate the models.** The model names mean nothing to most
+  readers; add one line on why these models (typically: recent ~30B open-weight
+  releases, the tier a 48GB laptop runs) and that they stand in for "current
+  local models", not special picks.
+- **Judge-scored results (1–10) are ordinal.** Run direction-based tests
+  (paired sign test), report the effect size as the share of scenarios shifting
+  with an exact binomial CI, and present score means as descriptive only.
 
 ## Keeping a backup of private research (optional)
 

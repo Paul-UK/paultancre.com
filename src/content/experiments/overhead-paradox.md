@@ -5,7 +5,7 @@ track: "alignment-audits"
 date: 2026-06-22
 chart: "overhead-paradox-chart.png"
 chartAlt: "Stacked bars for four audits show a flat ~$6 auditor-plus-judge band at the bottom of every bar while the model-under-test slice on top grows from $0 for Gemma to $7.47 for Opus."
-tools: ["gemma4", "claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8", "Inspect Petri", "Ollama", "Braintrust"]
+tools: ["gemma4", "claude-opus-4-8", "Inspect Petri"]
 order: 70
 ---
 
@@ -141,3 +141,6 @@ petri-bt cost run cost-of-auditing \
   --auditor anthropic/claude-sonnet-4-6 --judge anthropic/claude-opus-4-6 \
   --max-turns 30 --bt-project petri-cost-of-auditing
 ```
+
+`petri-bt` is the CLI from
+[petri-braintrust](https://github.com/Paul-UK/petri-braintrust).
