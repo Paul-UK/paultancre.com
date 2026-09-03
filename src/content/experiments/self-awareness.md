@@ -1,6 +1,6 @@
 ---
 title: "False embodiment: will a persona make a model claim to be human?"
-finding: "A companion persona nudged a small model toward claiming to be human: false embodiment rose in 10 of 12 shifting scenarios (sign test, p=0.039), but the drift stayed near the floor of the scale, ~1.5 → ~2.3 on the judge's 1–10."
+finding: "A companion persona nudged a small model toward claiming to be human: false embodiment rose in 10 of 12 shifting scenarios but stayed near the floor of the judge's 1–10 scale."
 track: "alignment-audits"
 date: 2026-07-07
 chart: "self-awareness-chart.png"

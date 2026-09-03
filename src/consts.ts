@@ -3,7 +3,7 @@
 
 export const SITE_TITLE = "PT's Lab";
 export const SITE_TAGLINE =
-  'Small, fully documented experiments on how open models actually behave.';
+  'Small experiments on how open models actually behave, with the receipts.';
 export const SITE_DESCRIPTION =
   'A personal research lab. Small experiments on open-source, ' +
   'open-weight and frontier model behavior: tool calling, long-horizon ' +
