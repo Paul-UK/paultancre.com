@@ -172,3 +172,50 @@ figure.chart figcaption {
   color: var(--ink-3);
   margin-top: 0.5rem;
 }
+
+/* ---- zoomable images + lightbox ---- */
+img[data-zoom] { cursor: zoom-in; }
+img[data-zoom]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 2.5rem 1.5rem;
+  background: rgba(0, 0, 0, 0.88);
+  cursor: zoom-out;
+}
+.lightbox[hidden] { display: none; }
+.lightbox img {
+  max-width: 96vw;
+  max-height: 84vh;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 6px;
+}
+.lightbox figcaption {
+  color: #e8e8e6;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 60rem;
+}
+.lightbox-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 1.1rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }

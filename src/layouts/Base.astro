@@ -62,8 +62,76 @@ const year = new Date().getFullYear();
         <p>© {year} {AUTHOR}</p>
       </div>
     </footer>
+
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged image" hidden>
+      <button type="button" class="lightbox-close" aria-label="Close enlarged image">×</button>
+      <img id="lightbox-img" src="" alt="" />
+      <figcaption id="lightbox-cap"></figcaption>
+    </div>
   </body>
 </html>
+
+<script>
+  // Click-to-zoom lightbox for charts and body images. Preserves the image's
+  // alt text: it drives the dialog label, the enlarged img's alt, and the
+  // caption. Keyboard accessible (Enter/Space to open, Esc to close).
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+  const lbCap = document.getElementById('lightbox-cap');
+  const lbClose = lb?.querySelector('.lightbox-close') as HTMLElement | null;
+  let lastFocus: HTMLElement | null = null;
+
+  // Mark charts and prose images (not nav/card thumbnails) as zoomable.
+  const zoomables = document.querySelectorAll<HTMLImageElement>(
+    'figure.chart img, .prose img'
+  );
+  for (const img of zoomables) {
+    img.dataset.zoom = '';
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    const alt = img.getAttribute('alt') ?? '';
+    img.setAttribute('aria-label', alt ? `Enlarge image: ${alt}` : 'Enlarge image');
+  }
+
+  function open(img: HTMLImageElement) {
+    if (!lb || !lbImg) return;
+    lastFocus = document.activeElement as HTMLElement | null;
+    lbImg.src = img.currentSrc || img.src;
+    const alt = img.getAttribute('alt') ?? '';
+    lbImg.alt = alt;
+    if (lbCap) lbCap.textContent = alt;
+    lb.setAttribute('aria-label', alt || 'Enlarged image');
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    lbClose?.focus();
+  }
+  function close() {
+    if (!lb || !lbImg) return;
+    lb.hidden = true;
+    lbImg.src = '';
+    document.body.style.overflow = '';
+    lastFocus?.focus();
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const zoom = t.closest?.('img[data-zoom]') as HTMLImageElement | null;
+    if (zoom) { open(zoom); return; }
+    // Any click inside the open lightbox (backdrop, image, close button) closes.
+    if (lb && !lb.hidden && t.closest?.('#lightbox')) close();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lb && !lb.hidden) { close(); return; }
+    if (e.key === 'Enter' || e.key === ' ') {
+      const el = document.activeElement as HTMLElement | null;
+      if (el?.matches?.('img[data-zoom]')) {
+        e.preventDefault();
+        open(el as HTMLImageElement);
+      }
+    }
+  });
+</script>
 
 <style>
   .nav-search { display: inline-block; margin-left: 1.1rem; }
