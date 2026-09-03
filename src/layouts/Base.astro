@@ -35,6 +35,16 @@ const year = new Date().getFullYear();
           <a href="/">Experiments</a>
           <a href="/about/">About</a>
           <a href={GITHUB_URL} rel="me noopener" target="_blank">Code</a>
+          <form class="nav-search" action="/" role="search">
+            <input
+              type="search"
+              name="q"
+              id="search"
+              placeholder="Search experiments…"
+              autocomplete="off"
+              aria-label="Search experiments"
+            />
+          </form>
         </nav>
       </div>
     </header>
@@ -54,3 +64,28 @@ const year = new Date().getFullYear();
     </footer>
   </body>
 </html>
+
+<style>
+  .nav-search { display: inline-block; margin-left: 1.1rem; }
+  .nav-search input {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.32rem 0.85rem;
+    width: 12rem;
+    max-width: 42vw;
+    transition: border-color 0.15s ease, width 0.15s ease;
+  }
+  .nav-search input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg);
+  }
+  @media (max-width: 560px) {
+    .nav-search { display: block; margin: 0.6rem 0 0; width: 100%; }
+    .nav-search input { width: 100%; max-width: none; }
+  }
+</style>

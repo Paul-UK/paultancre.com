@@ -29,16 +29,9 @@ const byTrack = trackKeys.map((key) => ({
     </p>
   </section>
 
-  <section class="wrap-wide search-wrap">
-    <input
-      id="search"
-      type="search"
-      autocomplete="off"
-      placeholder="Search experiments (try: nemotron, sycophancy, cost, tabs)"
-      aria-label="Search experiments"
-    />
+  <div class="wrap-wide">
     <p id="noresults" class="noresults mono" hidden>No experiments match that search.</p>
-  </section>
+  </div>
 
   {byTrack.map((track) => (
     <section class="track wrap-wide" data-track-section>
@@ -54,6 +47,9 @@ const byTrack = trackKeys.map((key) => ({
 </Base>
 
 <script>
+  // The search input lives in the nav (see Base.astro). On the homepage we
+  // filter cards live; on other pages the nav form submits to /?q= and this
+  // page reads it on load.
   const input = document.getElementById('search') as HTMLInputElement | null;
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
   const sections = Array.from(
@@ -78,13 +74,16 @@ const byTrack = trackKeys.map((key) => ({
     if (noresults) noresults.hidden = anyVisible;
   }
 
+  // On the homepage, Enter shouldn't reload the page (results are already live).
+  input?.closest('form')?.addEventListener('submit', (e) => e.preventDefault());
+
   // Clickable tags -> fill the search box.
   document.addEventListener('click', (e) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>('.chip[data-tag]');
     if (!el || !input) return;
     input.value = el.dataset.tag ?? '';
     apply(input.value);
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   input?.addEventListener('input', () => apply(input.value));
@@ -96,24 +95,12 @@ const byTrack = trackKeys.map((key) => ({
 </script>
 
 <style>
-  .hero { margin-bottom: 2rem; }
+  .hero { margin-bottom: 2.5rem; }
   .hero h1 { font-size: 2.4rem; margin: 0.3rem 0 0.5rem; letter-spacing: -0.03em; }
   .tagline { font-size: 1.2rem; color: var(--ink); margin: 0 0 1rem; max-width: 40rem; }
   .intro { color: var(--ink-2); max-width: 42rem; }
 
-  .search-wrap { margin-bottom: 3rem; }
-  #search {
-    width: 100%;
-    font-size: 1rem;
-    font-family: var(--font-sans);
-    color: var(--ink);
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.7rem 1rem;
-  }
-  #search:focus { outline: none; border-color: var(--accent); background: var(--bg); }
-  .noresults { margin: 0.8rem 0 0; color: var(--ink-3); }
+  .noresults { margin: 0 0 1.5rem; color: var(--ink-3); }
 
   .track { margin-bottom: 3.5rem; }
   .track-head { border-top: 1px solid var(--border); padding-top: 1.4rem; margin-bottom: 1.4rem; }
