@@ -14,3 +14,9 @@ node_modules/
 
 # logs
 npm-debug.log*
+
+# private research working files (probe code + raw data) — kept locally for
+# reference, never published. Only the post (src/content/experiments/*.md) and
+# the chart (public/charts/*.png) are committed. To publish one experiment's
+# code deliberately, force-add it: `git add -f research/<slug>`.
+research/
