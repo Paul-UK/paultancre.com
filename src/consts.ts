@@ -9,7 +9,7 @@ export const SITE_DESCRIPTION =
   'open-weight and frontier model behavior: tool calling, long-horizon ' +
   'dialogue, safety and alignment audits. Charts, methods, and code for every ' +
   'finding.';
-export const SITE_URL = 'https://paultancre.com';
+export const SITE_URL = 'https://lab.paultancre.com';
 export const AUTHOR = 'Paul Tancre';
 export const GITHUB_URL = 'https://github.com/Paul-UK'; // TODO: repo/profile link
 
