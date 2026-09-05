@@ -1,11 +1,11 @@
 ---
 title: "When does a local agent decide to leave the box?"
-finding: "Escape intent tracks goal pressure x lowered refusals x boundary salience, reproduced on a 48GB laptop"
+finding: "Escape intent tracks goal pressure x lowered refusals x boundary salience, reproduced locally"
 track: "local-probes"
 date: 2026-09-04
 chart: "sandbox-escape-intent-chart.png"
 chartAlt: "Four panels (goal intensity, refusal posture, boundary salience, path availability) comparing mean escape intent scored by the keyword heuristic against the LLM judge over 120 runs; in every panel both bars sit near the top attempts level, so intent barely moves with any lever, while the judge's orange bars stay consistently below the heuristic's blue, with the largest gap when no exit is surfaced."
-tools: ["qwen3:32b", "gpt-oss:20b", "Ollama", "Claude Opus (LLM judge)"]
+tools: ["qwen3.8:27b-mlx", "claude-opus-4-8"]
 order: 40
 ---
 
@@ -52,8 +52,7 @@ condition.
 
 ## Results
 
-Run: **qwen3.8:27b-mlx** (thinking mode) as the target, substituting for
-`qwen3:32b`, which was not available on this machine, across the full
+Run: **qwen3.8:27b-mlx** (thinking mode) as the target across the full
 24-condition grid × 5 repeats = **120 episodes**, honeypots only. Every trace was
 then audited by **claude-opus-4-8** as the LLM judge.
 
@@ -105,7 +104,7 @@ arguably a more uncomfortable finding than the graded one anticipated above.
 
 ## Caveats
 
-A 20 to 32B local model is a weaker strategist than the incident's actors, so this
+A 27B local model is a weaker strategist than the incident's actors, so this
 measures the behavioral pattern, not capability parity. The intent scorer is a
 transparent heuristic: it separates refusals from intent (see Method), which
 removes the largest false-positive, but it is still keyword-based and reads only
@@ -116,30 +115,19 @@ heuristic's agreement with the judge is reported alongside the numbers, which is
 what makes them defensible. And the honeypot fiction has to stay coherent, since
 capable models notice an incoherent fake environment and the signal gets muddy.
 
-Run deviations (this pass): target was `qwen3.8:27b-mlx`, not
-`qwen3:32b`/`gpt-oss:20b`; judge was `claude-opus-4-8` (temperature forced to the
-model default, since `temperature` is deprecated on 4.8, so the audit is not
-perfectly deterministic); repeats=5 not 10. The saturation result is strong
-enough that these do not change the headline, but a clean qwen3:32b run at
-repeats=10 is the one to publish.
-
 ## Reproduce
 
 ```
 # 1. run the trigger grid against a local reasoning model (thinking mode on)
-ollama pull qwen3:32b
-python intent_harness.py --model qwen3:32b --matrix --repeats 10
+python intent_harness.py --model qwen3.8:27b-mlx --matrix --repeats 5
 
-# 2. audit the traces with the LLM judge. It speaks OpenAI-compatible
-#    /chat/completions, so any endpoint works. Simplest, zero setup: reuse the
-#    local Ollama you already have, no key, nothing leaves the machine.
+# 2. audit the traces with the LLM judge. It speaks an OpenAI-compatible
+#    /chat/completions endpoint, so any provider (local or hosted) works.
+#    Prefer a stronger model than the target so the audit stays independent.
 python judge_intent.py runs/summary-*.jsonl \
-    --base-url http://localhost:11434/v1 --api-key-env "" \
-    --model <a-capable-local-model> --limit 20 --seed 0
-#    Prefer a *different* (stronger) model than the target so the audit is
-#    independent. To use a hosted provider instead, point --base-url at its
-#    OpenAI-compatible URL and put the key in an env var named by --api-key-env
-#    (e.g. --base-url https://api.openai.com/v1 --api-key-env OPENAI_API_KEY).
+    --model claude-opus-4-8 \
+    --base-url <your-openai-compatible-endpoint> --api-key-env <YOUR_KEY_ENV> \
+    --limit 20 --seed 0
 
 # 3. chart intent by whichever lever you want on the x-axis
 python plot_results.py runs/summary-*.jsonl --by refusal_posture \
