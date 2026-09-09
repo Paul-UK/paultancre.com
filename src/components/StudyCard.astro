@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { TRACKS } from '../consts';
+import { readingMinutes } from '../lib/readingTime';
 
 interface Props {
   study: CollectionEntry<'experiments'>;
@@ -8,6 +9,7 @@ interface Props {
 const { study } = Astro.props;
 const { title, finding, chart, date, tools, track, startHere } = study.data;
 const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+const minutes = readingMinutes(study.body ?? '');
 
 // Plain-text search haystack: title, finding, tags, track label, and body.
 const haystack = [
@@ -38,7 +40,7 @@ const haystack = [
         <button type="button" class="chip" data-tag={t}>{t}</button>
       ))}
     </div>
-    <span class="date mono">{dateStr}</span>
+    <span class="date mono">{dateStr} · {minutes} min</span>
   </div>
 </article>
 
