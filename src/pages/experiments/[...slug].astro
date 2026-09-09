@@ -42,7 +42,7 @@ const dateStr = date.toLocaleDateString('en-US', {
     <p class="finding">{finding}</p>
 
     <div class="meta mono">
-      <span>{dateStr}</span>
+      <time datetime={date.toISOString().slice(0, 10)}>{dateStr}</time>
       <span aria-hidden="true">·</span>
       <span>{minutes} min read</span>
     </div>

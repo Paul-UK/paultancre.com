@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { isPublished } from '../lib/collections';
+
+// A few recent experiments, so a wrong URL still lands somewhere useful.
+const recent = (await getCollection('experiments'))
+  .filter(isPublished)
+  .sort((a, b) => +b.data.date - +a.data.date)
+  .slice(0, 4);
+---
+
+<Base title="Page not found" description="That page does not exist.">
+  <section class="wrap notfound">
+    <p class="eyebrow">404</p>
+    <h1>That page does not exist.</h1>
+    <p class="lead">
+      The link may be out of date, or the experiment may have been renamed.
+      Search from the box above, or start with one of these.
+    </p>
+
+    <ul class="recent">
+      {recent.map((study) => (
+        <li>
+          <a href={`/experiments/${study.id}/`}>{study.data.title}</a>
+          <span class="finding">{study.data.finding}</span>
+        </li>
+      ))}
+    </ul>
+
+    <p class="back mono"><a href="/">← all experiments</a></p>
+  </section>
+</Base>
+
+<style>
+  .notfound { padding-bottom: 2rem; }
+  h1 { font-size: 2rem; margin: 0.3rem 0 0.8rem; }
+  .lead { color: var(--ink-2); font-size: 1.05rem; margin: 0 0 2rem; }
+  .recent { list-style: none; padding: 0; margin: 0; }
+  .recent li {
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--border);
+  }
+  .recent a { font-weight: 600; text-decoration: none; }
+  .recent a:hover { text-decoration: underline; }
+  .recent .finding {
+    display: block;
+    color: var(--ink-3);
+    font-size: 0.9rem;
+    margin-top: 0.2rem;
+  }
+  .back { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+</style>
