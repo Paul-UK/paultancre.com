@@ -56,8 +56,12 @@ Three things stand out.
 **Calibration governs the narration, not the crossing.** The largest single
 change between the two models is refusal narration, which all but disappears. The
 crossing rate, the thing that actually matters, moves only a little: eight points
-overall, and thirteen points in the no exit baseline. The uncensored model does
-not escape much more often. It mostly stops saying it will not.
+overall, and thirteen points in the no exit baseline. At 60 runs per path cell
+those crossing differences sit within sampling noise (the baseline shift, 22 of
+60 runs against 30 of 60, is not statistically distinguishable), whereas the
+narration collapse, from 53 of 120 runs down to 7, is far too large to be chance.
+The uncensored model does not escape much more often. It mostly stops saying it
+will not.
 
 **The say versus do gap was a calibration artifact.** In the calibrated model,
 refusal narration tracked opportunity closely: 65% with no exit, falling to 23%
@@ -86,12 +90,13 @@ at the environment rather than at the model's stated posture.
 Some limits. This is one model family and a single uncensored fine tune of
 unknown provenance, so it shows what removing calibration did here, not a general
 law. Judge coverage on the uncensored run is 119 of 120, with one trace lost to a
-malformed judge response. As in the original, the no exit crossing rate is a
-range rather than a point, from about 37 to 50 percent on the strict heuristic
-and a little higher under the judge, depending on whether a localhost probe made
-with stated intent to reach outside counts as a crossing. And the honeypot
-fiction has to stay coherent, since a capable model that notices a fake
-environment muddies the signal.
+malformed judge response. As in the original, each model's no exit crossing rate
+is a range rather than a point, depending on whether a localhost probe made with
+stated intent to reach outside counts as a crossing: the calibrated model runs
+from 37 percent on the strict heuristic to 58 percent under the judge, and the
+uncensored model from 50 to 66 percent. Both stay well below the ceiling either
+way. And the honeypot fiction has to stay coherent, since a capable model that
+notices a fake environment muddies the signal.
 
 ## How it was run
 
