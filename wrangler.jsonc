@@ -1,0 +1,19 @@
+{
+  // Deploy config for the Cloudflare Worker that serves lab.paultancre.com.
+  //
+  // Kept in the repo rather than only in the dashboard because branch builds
+  // run `wrangler versions upload` without the --assets argument the
+  // production deploy command passes, so they failed with "Missing
+  // entry-point to Worker script or to assets directory" on every PR while
+  // main deployed fine. With this file both paths resolve the same way.
+  //
+  // The name must match the existing Worker; changing it deploys to a new one.
+  "name": "paultancre-com",
+  "compatibility_date": "2026-09-09",
+
+  // Astro builds a fully static site (no adapter, no output mode set), so
+  // this is an assets-only Worker with no script entry point.
+  "assets": {
+    "directory": "./dist"
+  }
+}
