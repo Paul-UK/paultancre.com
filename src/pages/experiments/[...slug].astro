@@ -38,8 +38,10 @@ const dateStr = date.toLocaleDateString('en-US', {
 
   <article class="wrap">
     <p class="eyebrow"><a href="/">{TRACKS[track].label}</a></p>
-    <h1>{title}</h1>
-    <p class="finding">{finding}</p>
+    {/* Same name as the card's h3 on the homepage, so the title carries across
+        the navigation rather than fading out and back in. */}
+    <h1 transition:name={`study-title-${study.id}`}>{title}</h1>
+    <p class="finding lede">{finding}</p>
 
     <div class="meta mono">
       <time datetime={date.toISOString().slice(0, 10)}>{dateStr}</time>
@@ -65,7 +67,7 @@ const dateStr = date.toLocaleDateString('en-US', {
       <Content />
     </div>
 
-    <p class="back mono"><a href="/">← all experiments</a></p>
+    <p class="back mono"><a class="u" href="/">← all experiments</a></p>
   </article>
 </Base>
 
@@ -74,31 +76,42 @@ const dateStr = date.toLocaleDateString('en-US', {
   // 100% when the last line of the post is on screen, not when the footer is.
   // Transform rather than width keeps it off the layout path; the
   // ResizeObserver catches the chart image landing and changing the height.
-  const fill = document.querySelector<HTMLElement>('.progress-fill');
-  const article = document.querySelector<HTMLElement>('article.wrap');
+  //
+  // Listeners are registered once and the elements re-queried per frame, so the
+  // bar keeps working across client-side navigations (and does nothing on the
+  // pages that have no article).
+  let queued = false;
 
-  if (fill && article) {
-    let queued = false;
+  function update() {
+    queued = false;
+    const fill = document.querySelector<HTMLElement>('.progress-fill');
+    const article = document.querySelector<HTMLElement>('article.wrap');
+    if (!fill || !article) return;
+    const end = article.offsetTop + article.offsetHeight - window.innerHeight;
+    // Article fits on one screen: there is no progress to show.
+    const pct = end <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / end));
+    fill.style.transform = `scaleX(${pct})`;
+  }
 
-    function update() {
-      queued = false;
-      const end = article.offsetTop + article.offsetHeight - window.innerHeight;
-      // Article fits on one screen: there is no progress to show.
-      const pct = end <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / end));
-      fill.style.transform = `scaleX(${pct})`;
-    }
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(update);
+  }
 
-    function schedule() {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(update);
-    }
+  const ro = new ResizeObserver(schedule);
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
 
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    new ResizeObserver(schedule).observe(article);
+  function attach() {
+    ro.disconnect();
+    const article = document.querySelector<HTMLElement>('article.wrap');
+    if (article) ro.observe(article);
     update();
   }
+
+  attach();
+  document.addEventListener('astro:page-load', attach);
 </script>
 
 <style>
@@ -119,20 +132,17 @@ const dateStr = date.toLocaleDateString('en-US', {
     transform-origin: 0 50%;
   }
 
-  h1 { font-size: 2rem; margin: 0.3rem 0 0.6rem; }
-  .finding {
-    font-size: 1.2rem;
-    color: var(--ink);
-    margin: 0 0 1.2rem;
-    line-height: 1.45;
-  }
+  h1 { font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.7rem); margin: 0.4rem 0 0.7rem; }
+  .finding { margin: 0 0 1.3rem; }
   .meta {
     display: flex;
     gap: 0.5rem;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--ink-3);
   }
   .chips a.chip { text-decoration: none; }
-  .chips a.chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chips a.chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
   .back { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .back a { color: var(--ink-2); }
+  .back a:hover { color: var(--accent); }
 </style>

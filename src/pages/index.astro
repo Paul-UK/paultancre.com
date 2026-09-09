@@ -19,10 +19,10 @@ const byTrack = trackKeys.map((key) => ({
 
 <Base>
   <section class="hero wrap-wide">
-    <p class="eyebrow">Research notes</p>
-    <h1>{SITE_TITLE}</h1>
-    <p class="tagline">{SITE_TAGLINE}</p>
-    <p class="intro">
+    <p class="eyebrow fade">Research notes</p>
+    <h1><span class="line"><span style="--d:0.06s">{SITE_TITLE}</span></span></h1>
+    <p class="tagline lede fade" style="--d:0.2s">{SITE_TAGLINE}</p>
+    <p class="intro fade" style="--d:0.34s">
       Each post is a small, self-contained experiment with a real result: the
       chart, the method, and the numbers behind it. Two threads run through
       the lab, and they read differently on purpose. <strong>Local-model
@@ -39,12 +39,12 @@ const byTrack = trackKeys.map((key) => ({
 
   {byTrack.map((track) => (
     <section class="track wrap-wide" data-track-section>
-      <div class="track-head">
+      <div class="track-head reveal">
         <h2>{track.label}</h2>
         <p>{track.blurb}</p>
       </div>
       <div class="grid">
-        {track.studies.map((study) => <StudyCard study={study} />)}
+        {track.studies.map((study, i) => <StudyCard study={study} index={i} />)}
       </div>
     </section>
   ))}
@@ -54,66 +54,105 @@ const byTrack = trackKeys.map((key) => ({
   // The search input lives in the nav (see Base.astro). On the homepage we
   // filter cards live; on other pages the nav form submits to /?q= and this
   // page reads it on load.
-  const input = document.getElementById('search') as HTMLInputElement | null;
-  const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
-  const sections = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-track-section]')
-  );
-  const noresults = document.getElementById('noresults');
+  //
+  // The header is transition:persist'd, so the input survives navigation while
+  // the cards do not. Everything is therefore delegated at the document level
+  // once, and `apply` is re-pointed at the current page's cards on each
+  // astro:page-load.
+  let apply: (query: string) => void = () => {};
+  let onHome = false;
 
-  function apply(query: string) {
-    const q = query.trim().toLowerCase();
-    let anyVisible = false;
-    for (const card of cards) {
-      const hay = card.dataset.haystack ?? '';
-      const match = q === '' || hay.includes(q);
-      card.hidden = !match;
-      if (match) anyVisible = true;
+  function init() {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-track-section]')
+    );
+    const noresults = document.getElementById('noresults');
+    const input = document.getElementById('search') as HTMLInputElement | null;
+    onHome = cards.length > 0;
+    if (!onHome) { apply = () => {}; return; }
+
+    apply = (query: string) => {
+      const q = query.trim().toLowerCase();
+      let anyVisible = false;
+      for (const card of cards) {
+        const hay = card.dataset.haystack ?? '';
+        const match = q === '' || hay.includes(q);
+        card.hidden = !match;
+        if (match) anyVisible = true;
+      }
+      // Hide a track section if none of its cards are visible.
+      for (const section of sections) {
+        const visible = section.querySelectorAll('.card:not([hidden])').length;
+        section.hidden = visible === 0;
+      }
+      if (noresults) noresults.hidden = anyVisible;
+    };
+
+    // Prefill from ?q= (e.g. a tag link from a post page), or from whatever the
+    // persisted input already holds after a client-side navigation home.
+    const q0 = new URLSearchParams(location.search).get('q') ?? input?.value ?? '';
+    if (q0) {
+      if (input) input.value = q0;
+      apply(q0);
     }
-    // Hide a track section if none of its cards are visible.
-    for (const section of sections) {
-      const visible = section.querySelectorAll('.card:not([hidden])').length;
-      section.hidden = visible === 0;
-    }
-    if (noresults) noresults.hidden = anyVisible;
   }
 
+  document.addEventListener('input', (e) => {
+    const t = e.target as HTMLElement;
+    if (t?.id === 'search') apply((t as HTMLInputElement).value);
+  });
+
   // On the homepage, Enter shouldn't reload the page (results are already live).
-  input?.closest('form')?.addEventListener('submit', (e) => e.preventDefault());
+  document.addEventListener('submit', (e) => {
+    if (onHome && (e.target as HTMLElement)?.closest?.('.nav-search')) e.preventDefault();
+  });
 
   // Clickable tags -> fill the search box.
   document.addEventListener('click', (e) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>('.chip[data-tag]');
-    if (!el || !input) return;
+    if (!el || !onHome) return;
+    const input = document.getElementById('search') as HTMLInputElement | null;
+    if (!input) return;
     input.value = el.dataset.tag ?? '';
     apply(input.value);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  input?.addEventListener('input', () => apply(input.value));
-
-  // Prefill from ?q= (e.g. a tag link from a post page).
-  const params = new URLSearchParams(location.search);
-  const q0 = params.get('q');
-  if (q0 && input) { input.value = q0; apply(q0); }
+  init();
+  document.addEventListener('astro:page-load', init);
 </script>
 
 <style>
-  .hero { margin-bottom: 2.5rem; }
-  .hero h1 { font-size: 2.4rem; margin: 0.3rem 0 0.5rem; letter-spacing: -0.03em; }
-  .tagline { font-size: 1.2rem; color: var(--ink); margin: 0 0 1rem; max-width: 40rem; }
+  .hero { margin-bottom: 3.5rem; }
+  .hero h1 { font-size: var(--h1); margin: 0.4rem 0 0.7rem; }
+  .tagline { margin: 0 0 1.2rem; max-width: 40rem; }
   .intro { color: var(--ink-2); max-width: 42rem; }
 
   .noresults { margin: 0 0 1.5rem; color: var(--ink-3); }
 
-  .track { margin-bottom: 3.5rem; }
-  .track-head { border-top: 1px solid var(--border); padding-top: 1.4rem; margin-bottom: 1.4rem; }
-  .track-head h2 { margin: 0 0 0.35rem; font-size: 1.5rem; }
-  .track-head p { margin: 0; color: var(--ink-2); max-width: 42rem; font-size: 0.95rem; }
+  .track { margin-bottom: 4rem; }
+  .track-head {
+    border-top: 1px solid var(--border);
+    padding-top: 1.4rem;
+    margin-bottom: 1.6rem;
+    display: flex;
+    gap: 2rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .track-head h2 { margin: 0; font-size: 1.65rem; flex: 0 0 auto; }
+  .track-head p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 0.92rem;
+    flex: 1 1 22rem;
+    max-width: 34rem;
+  }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
-    gap: 1.2rem;
+    gap: 1.4rem;
   }
 </style>

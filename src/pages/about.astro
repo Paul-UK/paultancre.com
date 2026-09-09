@@ -6,10 +6,10 @@ import { AUTHOR, GITHUB_URL, GITHUB_REPO_URL } from '../consts';
 
 <Base title="About" description={`About ${AUTHOR}`}>
   <article class="wrap">
-    <p class="eyebrow">About</p>
-    <h1>Hi, I'm {AUTHOR}.</h1>
+    <p class="eyebrow fade">About</p>
+    <h1><span class="line"><span style="--d:0.06s">Hi, I'm {AUTHOR}.</span></span></h1>
 
-    <div class="prose">
+    <div class="prose fade" style="--d:0.2s">
       <p>
         I like running small experiments on open-source and open-weight
         models: how they behave, where they break, and what happens when you
@@ -20,21 +20,30 @@ import { AUTHOR, GITHUB_URL, GITHUB_REPO_URL } from '../consts';
 
       <p>
         The audit tooling behind the alignment experiments is open source:
-        <a href={GITHUB_REPO_URL} rel="me noopener" target="_blank">petri-braintrust</a>.
+        <a class="u" href={GITHUB_REPO_URL} rel="me noopener" target="_blank">petri-braintrust</a>.
         The smaller local-probe scripts are private for now, but each writeup
         describes its method, prompts, grading rules, sampling settings, in
         enough detail to rebuild it. I'm on
-        <a href={GITHUB_URL} rel="me noopener" target="_blank">GitHub</a> and
-        <a href="https://www.linkedin.com/in/paultancre/" rel="me noopener" target="_blank">LinkedIn</a>.
+        <a class="u" href={GITHUB_URL} rel="me noopener" target="_blank">GitHub</a> and
+        <a class="u" href="https://www.linkedin.com/in/paultancre/" rel="me noopener" target="_blank">LinkedIn</a>.
         The ideas and experiments are mine, built with AI assistance.
       </p>
     </div>
 
-    <p class="back mono"><a href="/">← all experiments</a></p>
+    {/* The figure carries the accessible name; the two images are decorative
+        alternates of each other, swapped by theme. */}
+    <figure class="signature reveal" role="img" aria-label={`${AUTHOR}'s signature`}>
+      <img class="sig-light" src="/img/signature-light.png" alt="" width="490" height="264" />
+      <img class="sig-dark" src="/img/signature-dark.png" alt="" width="490" height="264" />
+    </figure>
+
+    <p class="back mono"><a class="u" href="/">← all experiments</a></p>
   </article>
 </Base>
 
 <style>
-  h1 { font-size: 2rem; margin: 0.3rem 0 1.2rem; }
+  h1 { font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.7rem); margin: 0.4rem 0 1.3rem; }
   .back { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .back a { color: var(--ink-2); }
+  .back a:hover { color: var(--accent); }
 </style>
