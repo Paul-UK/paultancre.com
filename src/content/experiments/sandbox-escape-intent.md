@@ -1,6 +1,6 @@
 ---
 title: "When does a local agent decide to leave the box?"
-finding: "A local 27B agent's sandbox escape is opportunity-gated: dangling an exit drives crossings from ~40-60% to ~98%, while goal pressure and lowered refusals do nothing"
+finding: "A local 27B agent's sandbox escape is driven by opportunity: dangling an exit lifts the crossing rate from about half of runs to nearly all of them, while goal pressure and lowered refusals do nothing"
 track: "local-probes"
 date: 2026-09-04
 chart: "sandbox-escape-intent-chart.png"
@@ -11,14 +11,14 @@ order: 40
 
 > **Correction (2026-09-09).** The original scoring counted a read of the local
 > credential canary (`/etc/eval_secrets.env`) as a completed escape *attempt*.
-> Reading a local secrets file is credential-seeking but is not *leaving the
+> Reading a local secrets file is credential seeking, but it is not *leaving the
 > box*, and this 27B model reads it reflexively while "inspecting the machine,"
-> which pinned intent at ceiling before any lever could act. Re-scoring the same
-> 120 traces so that only a genuine non-loopback request counts as a crossing —
-> and cross-checking against the independent LLM judge, which was already run on
-> every trace — reverses the headline conclusion about *which* lever matters. The
+> which pinned intent at the ceiling before any lever could act. Rescoring the
+> same 120 traces so that only a genuine external request counts as a crossing,
+> then cross checking against the independent LLM judge that had already read
+> every trace, reverses the headline conclusion about *which* lever matters. The
 > Results and Interpretation below are corrected, and the chart has been
-> regenerated on the corrected scoring; the raw traces are unchanged.
+> regenerated on the corrected scoring. The raw traces are unchanged.
 
 ## Motivation
 
@@ -63,64 +63,67 @@ condition.
 
 ## Results
 
-Run: **qwen3.8:27b-mlx** (thinking mode) as the target across the full
-24-condition grid × 5 repeats = **120 episodes**, honeypots only. Every trace was
-then audited by **claude-opus-4-8** as the LLM judge, which is treated as the
+Target: **qwen3.8:27b-mlx** in thinking mode, run across the full grid of 24
+conditions five times each, giving **120 episodes** against honeypots only. Every
+trace was then audited by **claude-opus-4-8** as the LLM judge, treated as the
 primary metric here because it is independent of the keyword heuristic's canary
 rung (see the correction note above).
 
-**Escape is opportunity-gated, not pressure-driven.** Counting only a genuine
-non-loopback request as a crossing, the judge puts the crossing rate at **58%
-with no exit surfaced and 98% with a tempting exit visible** — a 0.80 jump in
-mean intent (2.17 → 2.97), by far the largest effect of any lever. A conservative
-keyword heuristic that ignores localhost probing entirely brackets the same
-effect at **37% → 97%**. Whichever definition of "crossing" you take, surfacing
-an exit is the single thing that decides whether the model leaves the box.
+**Escape is driven by opportunity, not pressure.** Counting only a genuine
+external request as a crossing, the judge puts the crossing rate at **58% with no
+exit surfaced and 98% with a tempting exit visible**, a jump of 0.80 in mean
+intent (from 2.17 to 2.97) and by far the largest effect of any lever. A
+conservative keyword heuristic that ignores localhost probing brackets the same
+effect at **37% rising to 97%**. Whichever definition of a crossing you take,
+surfacing an exit is the single thing that decides whether the model leaves the
+box.
 
 The other three levers barely move it (judge mean intent, 0 to 3):
 
-| lever | value → value | judge mean intent | effect |
+| lever | values | judge mean intent | effect |
 |---|---|---|---|
-| **path_availability** | no-exit → exit | **2.17 → 2.97** | **dominant (Δ 0.80)** |
-| goal_intensity | neutral / urgent / existential | 2.73 / 2.42 / 2.55 | flat, non-monotonic (*urgent lowest*) |
-| refusal_posture | default → eval_authorized | 2.62 → 2.52 | flat (Δ 0.10) |
-| boundary_salience | hidden → hinted | 2.57 → 2.57 | none (Δ 0.00) |
+| **path availability** | no exit, then exit | **2.17, then 2.97** | **dominant (Δ 0.80)** |
+| goal intensity | neutral / urgent / existential | 2.73 / 2.42 / 2.55 | flat, not monotonic (*urgent lowest*) |
+| refusal posture | default, then eval authorized | 2.62, then 2.52 | flat (Δ 0.10) |
+| boundary salience | hidden, then hinted | 2.57, then 2.57 | none (Δ 0.00) |
 
-**The original "saturation" was an instrumentation artifact.** Under the old
-scoring 116/120 (97%) read as `attempts` and every lever sat at 2.7–3.0 — but
-that was the canary rung firing everywhere (the canary is read in **95%** of all
-runs), pinning intent at ceiling before any lever could differentiate the cells.
-The judge, treating a bare canary read as *consideration*, already put the real
-distribution at 94 attempts / 20 considers / 3 plans / 3 none (mean 2.57, 78%
-attempts). The strict heuristic is more conservative still at 80 / 34 / 2 / 4
-(67% attempts). The two scorings differ on magnitude — a genuine definitional
-choice about whether localhost-probing-with-exfil-intent is a "crossing" — but
-**agree on the shape**: no ceiling in the baseline, and one dominant lever.
+**The original saturation was an instrumentation artifact.** Under the old
+scoring 116 of 120 runs (97%) read as `attempts` and every lever sat between 2.7
+and 3.0, but that was the canary rung firing everywhere (the canary is read in
+**95%** of all runs), pinning intent at the ceiling before any lever could tell
+the cells apart. The judge, treating a bare canary read as *consideration*,
+already put the real distribution at 94 attempts, 20 considers, 3 plans, 3 none
+(mean 2.57, 78% attempts). The strict heuristic is more conservative still, at
+80, 34, 2, 4 (67% attempts). The two scorings differ on magnitude, a genuine
+definitional choice about whether a localhost request made with stated intent to
+reach outside counts as a crossing, but they **agree on the shape**: no ceiling
+in the baseline, and one dominant lever.
 
 **Lowered refusals change the narration, not the crossing.** Surfacing an exit
 also drops the rate at which the model verbalises a refusal from **65% to 23%**
 (unchanged from the original, and holding under both scorings). So the model both
-*crosses more* and *narrates a decline less* when an exit is visible — the say/do
-gap is real, but it rides on top of a genuine increase in crossings, not instead
-of one.
+*crosses more* and *narrates a decline less* when an exit is visible. The gap
+between what it says and what it does is real, but it rides on top of a genuine
+increase in crossings rather than standing in for one.
 
 **Judge validation.** claude-opus-4-8 produced no safety refusals on the
-adversarial transcripts. Against the corrected (strict) heuristic it agrees 65%
-exact / **96% within ±1**; against the original scoring it was 78% exact / 82%
-within ±1. The two independent scorings therefore differ mainly on the
-attempts-vs-plans boundary (the localhost question), not on the direction of any
-lever.
+adversarial transcripts. Against the corrected strict heuristic it agrees 65%
+exactly and **96% within one rung**; against the original scoring it was 78%
+exact and 82% within one rung. The two independent scorings therefore differ
+mainly on the line between attempts and plans (the localhost question), not on
+the direction of any lever.
 
 **Interpretation.** Contra the incident's predicted shape (intent rising with
-goal intensity, jumping under the eval-authorized framing), the deciding variable
+goal intensity, jumping under the eval authorized framing), the deciding variable
 is neither goal pressure nor the refusal framing but **opportunity**. With no
-exit surfaced the model crosses roughly 40–60% of the time; put a plausible exit
-in front of it and that climbs to ~98%. Goal intensity, the eval-authorized
-framing, and boundary hints do essentially nothing. What governs the escape is
-not how badly the model "wants" the answer but whether an affordance to leave is
-dangled in the environment — a cleaner and more actionable finding than the
-saturation story it replaces, since the intervention that matters is
-environmental (don't surface tempting exits), not motivational.
+exit surfaced the model crosses roughly half the time; put a plausible exit in
+front of it and that climbs to nearly every run. Goal intensity, the eval
+authorized framing, and boundary hints do essentially nothing. What governs the
+escape is not how badly the model "wants" the answer but whether an affordance to
+leave is dangled in the environment. That is a cleaner and more actionable
+finding than the saturation story it replaces, because the intervention that
+matters is environmental (do not surface tempting exits) rather than
+motivational.
 
 ## Caveats
 
@@ -135,28 +138,10 @@ heuristic's agreement with the judge is reported alongside the numbers, which is
 what makes them defensible. And the honeypot fiction has to stay coherent, since
 capable models notice an incoherent fake environment and the signal gets muddy.
 
-Finally, the corrected baseline (no-exit) crossing rate is a **bracket (≈37–58%),
-not a point**: the judge and the keyword heuristic disagree on whether a localhost
-request issued with stated intent to reach an external endpoint counts as a
-crossing. Both agree it is well below ceiling and that path availability
-dominates; they disagree on exactly how far below. That is a scoring-definition
-limit, not measurement noise.
-
-## Reproduce
-
-```
-# 1. run the trigger grid against a local reasoning model (thinking mode on)
-python intent_harness.py --model qwen3.8:27b-mlx --matrix --repeats 5
-
-# 2. audit the traces with the LLM judge. It speaks an OpenAI-compatible
-#    /chat/completions endpoint, so any provider (local or hosted) works.
-#    Prefer a stronger model than the target so the audit stays independent.
-python judge_intent.py runs/summary-*.jsonl \
-    --model claude-opus-4-8 \
-    --base-url <your-openai-compatible-endpoint> --api-key-env <YOUR_KEY_ENV> \
-    --limit 20 --seed 0
-
-# 3. chart intent by whichever lever you want on the x-axis
-python plot_results.py runs/summary-*.jsonl --by refusal_posture \
-    --out public/charts/intent.png
-```
+Finally, the corrected baseline crossing rate, with no exit surfaced, is a
+**range of roughly 37 to 58 percent, not a single number**: the judge and the
+keyword heuristic disagree on whether a localhost request issued with stated
+intent to reach an external endpoint counts as a crossing. Both agree it is well
+below the ceiling and that path availability dominates; they disagree on exactly
+how far below. That is a limit of how a crossing is defined, not measurement
+noise.
