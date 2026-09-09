@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Mini bar chart in the site palette: Okabe-Ito blue ground, white bars,
-       amber final bar echoing the charts' second series. -->
-  <rect width="32" height="32" rx="7" fill="#0072b2"/>
-  <rect x="6.5" y="17" width="4.5" height="8.5" rx="1.5" fill="#fcfcfb"/>
-  <rect x="13.75" y="12" width="4.5" height="13.5" rx="1.5" fill="#fcfcfb"/>
-  <rect x="21" y="6.5" width="4.5" height="19" rx="1.5" fill="#e69f00"/>
+  <!-- The step change: a flat baseline, a sharp riser, a new plateau. It is the
+       shape almost every experiment here ends up drawing — a measure sits flat
+       under every lever you pull, until one lever moves it. Amber on ink so it
+       holds up against both a light and a dark browser tab. -->
+  <rect width="32" height="32" rx="7" fill="#0b0b0b"/>
+  <path d="M6.5 23H14.5V9H25.5" fill="none" stroke="#e69f00"
+        stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

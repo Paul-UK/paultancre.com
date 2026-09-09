@@ -5,8 +5,10 @@ import { readingMinutes } from '../lib/readingTime';
 
 interface Props {
   study: CollectionEntry<'experiments'>;
+  /** Position within its track, used to stagger the scroll-in. */
+  index?: number;
 }
-const { study } = Astro.props;
+const { study, index = 0 } = Astro.props;
 const { title, finding, chart, date, tools, track, startHere } = study.data;
 const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 const minutes = readingMinutes(study.body ?? '');
@@ -21,7 +23,11 @@ const haystack = [
 ].join(' • ').toLowerCase();
 ---
 
-<article class:list={['card', { 'is-start': startHere }]} data-haystack={haystack}>
+<article
+  class:list={['card', 'reveal', { 'is-start': startHere }]}
+  style={`--d:${(index * 0.07).toFixed(2)}s`}
+  data-haystack={haystack}
+>
   {startHere && <span class="start-badge" aria-hidden="true">Start here</span>}
   <a class="card-link" href={`/experiments/${study.id}/`}>
     {chart && (
@@ -30,7 +36,9 @@ const haystack = [
       </div>
     )}
     <div class="body">
-      <h3>{title}</h3>
+      {/* Pairs with the h1 on the post page: the title morphs across the
+          navigation instead of cross-fading with everything else. */}
+      <h3 transition:name={`study-title-${study.id}`}>{title}</h3>
       <p class="finding">{finding}</p>
     </div>
   </a>
@@ -55,9 +63,13 @@ const haystack = [
     border-radius: 12px;
     overflow: hidden;
     background: var(--bg);
-    transition: border-color 0.15s ease, transform 0.15s ease;
   }
-  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  /* The reveal owns opacity/transform, so hover only touches border and shadow
+     — otherwise the two transitions fight over the same properties. */
+  .card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.45);
+  }
   .card.is-start { border-color: var(--accent); }
   .start-badge {
     position: absolute;
@@ -65,8 +77,8 @@ const haystack = [
     left: 0.6rem;
     z-index: 1;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.02em;
+    font-size: 0.66rem;
+    letter-spacing: 0.03em;
     background: var(--accent);
     color: var(--bg);
     border-radius: 999px;
@@ -81,29 +93,38 @@ const haystack = [
     aspect-ratio: 16 / 8;
     overflow: hidden;
   }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
-  .body { padding: 0.9rem 1rem 0.4rem; }
-  .body h3 { margin: 0 0 0.35rem; font-size: 1.02rem; }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+    transition: transform 0.5s var(--ease);
+  }
+  .card:hover .thumb img { transform: scale(1.035); }
+  .body { padding: 1rem 1.1rem 0.5rem; }
+  .body h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1.16rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  .card:hover .body h3 { color: var(--accent); }
   .finding { margin: 0; color: var(--ink-2); font-size: 0.9rem; line-height: 1.5; }
   .foot {
     margin-top: auto;
-    padding: 0.6rem 1rem 0.9rem;
+    padding: 0.7rem 1.1rem 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
   }
   .foot .chips { margin: 0; }
-  .chip {
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--ink-2);
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.1rem 0.5rem;
+  .chip { cursor: pointer; font-size: 0.68rem; padding: 0.1rem 0.5rem; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .date { font-size: 0.7rem; color: var(--ink-3); white-space: nowrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thumb img, .body h3 { transition: none; }
+    .card:hover .thumb img { transform: none; }
   }
-  .chip:hover { border-color: var(--accent); color: var(--accent); }
-  .date { font-size: 0.72rem; color: var(--ink-3); white-space: nowrap; }
 </style>

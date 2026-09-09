@@ -1,0 +1,95 @@
+<!doctype html>
+<!-- Source for the site-wide Open Graph card. Rendered to public/og-default.png
+     by scripts/make-og.sh using headless Chrome, so the card is drawn with the
+     same fonts and palette as the site itself rather than an approximation.
+     Edit this, re-run the script, commit the PNG. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Newsreader'; font-style: normal; font-weight: 400 500;
+    src: url('/public/fonts/newsreader-latin.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Newsreader'; font-style: italic; font-weight: 400;
+    src: url('/public/fonts/newsreader-italic-latin.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 600;
+    src: url('/public/fonts/jetbrainsmono-latin.woff2') format('woff2');
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background: #131311;
+    color: #f2f1ee;
+    padding: 72px 76px 64px;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .top { display: flex; align-items: center; gap: 20px; }
+  .mark { width: 54px; height: 54px; flex: 0 0 auto; }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #eab648;
+  }
+
+  h1 {
+    font-size: 132px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.028em;
+    margin-top: 48px;
+  }
+
+  .tagline {
+    font-style: italic;
+    font-size: 43px;
+    line-height: 1.3;
+    color: #b9b7b1;
+    margin-top: 28px;
+    /* Wide enough to break into two full-measure lines; a narrower cap
+       stacked it three-deep and left the right half of the card empty. */
+    max-width: 940px;
+  }
+
+  .foot {
+    margin-top: auto;
+    padding-top: 26px;
+    border-top: 1px solid #2c2b27;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 19px;
+    color: #85837d;
+  }
+  .foot .url { color: #f2f1ee; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path d="M6.5 23H14.5V9H25.5" stroke="#eab648" stroke-width="3.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="eyebrow">Research notes</span>
+  </div>
+
+  <h1>PT&rsquo;s Lab</h1>
+  <p class="tagline">Small experiments on how open models actually behave, with the receipts.</p>
+
+  <div class="foot">
+    <span class="url">lab.paultancre.com</span>
+    <span>Paul Tancre</span>
+  </div>
+</body>
+</html>

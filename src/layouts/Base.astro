@@ -1,6 +1,10 @@
 ---
 import '../styles/global.css';
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, AUTHOR, GITHUB_REPO_URL } from '../consts';
+import { ClientRouter } from 'astro:transitions';
+import {
+  SITE_TITLE, SITE_DESCRIPTION, SITE_URL, AUTHOR, GITHUB_REPO_URL,
+  OG_IMAGE, OG_IMAGE_ALT,
+} from '../consts';
 
 interface Props {
   title?: string;
@@ -24,16 +28,19 @@ const {
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const canonical = new URL(Astro.url.pathname, SITE_URL).href;
 // Open Graph requires an absolute URL; a root-relative path is silently
-// dropped by most scrapers.
-const ogImage = image ? new URL(image, SITE_URL).href : undefined;
+// dropped by most scrapers. Pages without a chart of their own fall back to the
+// site card, so every link previews as a large image rather than bare text.
+const ogImage = new URL(image ?? OG_IMAGE, SITE_URL).href;
+const ogImageAlt = image ? imageAlt : OG_IMAGE_ALT;
 const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -42,35 +49,94 @@ const year = new Date().getFullYear();
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    {ogImage && imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+    <meta property="og:image" content={ogImage} />
+    {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
     {published && (
       <meta property="article:published_time" content={published.toISOString()} />
     )}
-    {/* Only claim a large-image card when there is actually an image to show;
-        otherwise the post shares as an empty box. */}
-    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {/* The two faces that paint the first screen on every page. The rest of the
+        subsets are pulled in by unicode-range only when a page needs them. */}
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="/fonts/newsreader-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="/fonts/inter-latin.woff2" />
     <link
       rel="alternate"
       type="application/rss+xml"
       title={`${SITE_TITLE} experiments`}
       href={new URL('/rss.xml', SITE_URL).href}
     />
+    <ClientRouter />
+
+    {/* Runs before first paint so the stored theme never flashes, and again
+        after every client-side navigation, because ClientRouter restores
+        <html>'s authored attributes on swap. */}
+    <script is:inline>
+      (function () {
+        function applyChrome() {
+          var d = document.documentElement;
+          d.classList.remove('no-js');
+          var t = null;
+          try { t = localStorage.getItem('theme'); } catch (e) {}
+          if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+          else d.removeAttribute('data-theme');
+          var btn = document.querySelector('.theme-toggle');
+          if (btn) {
+            var state = d.getAttribute('data-theme') || 'system';
+            var next = state === 'system' ? 'light' : state === 'light' ? 'dark' : 'system';
+            btn.setAttribute('aria-label', 'Theme: ' + state + '. Switch to ' + next + '.');
+            btn.setAttribute('title', 'Theme: ' + state);
+          }
+        }
+        applyChrome();
+
+        // The reveal animations start at opacity 0 and are only ever made
+        // visible by the bundled module script below. applyChrome() has just
+        // dropped the .no-js escape hatch, so if that module fails to load or
+        // throws, every card, track heading and the signature would stay
+        // invisible for good. If it has not announced itself in time, put the
+        // hatch back and show everything unanimated.
+        setTimeout(function () {
+          var d = document.documentElement;
+          if (!d.classList.contains('js-ready')) d.classList.add('no-js');
+        }, 2500);
+
+        // Cycles system -> light -> dark -> system. Delegated once, so it keeps
+        // working after the header is swapped out by a navigation.
+        document.addEventListener('click', function (e) {
+          var btn = e.target.closest && e.target.closest('.theme-toggle');
+          if (!btn) return;
+          var d = document.documentElement;
+          var cur = d.getAttribute('data-theme');
+          var next = cur === null ? 'light' : cur === 'light' ? 'dark' : null;
+          try {
+            if (next) localStorage.setItem('theme', next);
+            else localStorage.removeItem('theme');
+          } catch (err) {}
+          if (next) d.setAttribute('data-theme', next);
+          else d.removeAttribute('data-theme');
+          applyChrome();
+        });
+        document.addEventListener('astro:after-swap', applyChrome);
+      })();
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="site-header">
+    <header class="site-header" transition:persist="site-header">
       <div class="wrap-wide">
         <a class="brand" href="/">{SITE_TITLE}</a>
         <nav>
-          <a href="/">Experiments</a>
-          <a href="/about/">About</a>
-          <a href={GITHUB_REPO_URL} rel="me noopener" target="_blank">Code</a>
+          <a class="u" href="/">Experiments</a>
+          <a class="u" href="/about/">About</a>
+          <a class="u" href={GITHUB_REPO_URL} rel="me noopener" target="_blank">Code</a>
           <form class="nav-search" action="/" role="search">
             <input
               type="search"
@@ -81,6 +147,21 @@ const year = new Date().getFullYear();
               aria-label="Search experiments"
             />
           </form>
+          <button type="button" class="theme-toggle" aria-label="Switch theme">
+            <svg class="i-system" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4" />
+            </svg>
+            <svg class="i-light" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" />
+              <path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7" />
+            </svg>
+            <svg class="i-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7Z" />
+            </svg>
+          </button>
         </nav>
       </div>
     </header>
@@ -97,7 +178,7 @@ const year = new Date().getFullYear();
           code is linked where it exists.
         </p>
         <p>
-          © {year} {AUTHOR} · <a href="/rss.xml">RSS</a>
+          © {year} {AUTHOR} · <a class="u" href="/rss.xml">RSS</a>
         </p>
       </div>
     </footer>
@@ -111,43 +192,33 @@ const year = new Date().getFullYear();
 </html>
 
 <script>
-  // Click-to-zoom lightbox for charts and body images. Preserves the image's
-  // alt text: it drives the dialog label, the enlarged img's alt, and the
-  // caption. Keyboard accessible (Enter/Space to open, Esc to close).
-  const lb = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
-  const lbCap = document.getElementById('lightbox-cap');
-  const lbClose = lb?.querySelector('.lightbox-close') as HTMLElement | null;
+  // Click-to-zoom lightbox for charts and body images, plus the scroll-reveal
+  // observer. Both are re-armed on every astro:page-load (which also fires on
+  // the first load) because ClientRouter swaps the body without re-running
+  // module scripts; the document-level listeners are registered only once.
+  const lb = () => document.getElementById('lightbox');
+  const lbImg = () => document.getElementById('lightbox-img') as HTMLImageElement | null;
   let lastFocus: HTMLElement | null = null;
 
-  // Mark charts and prose images (not nav/card thumbnails) as zoomable.
-  const zoomables = document.querySelectorAll<HTMLImageElement>(
-    'figure.chart img, .prose img'
-  );
-  for (const img of zoomables) {
-    img.dataset.zoom = '';
-    img.tabIndex = 0;
-    img.setAttribute('role', 'button');
-    const alt = img.getAttribute('alt') ?? '';
-    img.setAttribute('aria-label', alt ? `Enlarge image: ${alt}` : 'Enlarge image');
-  }
-
   function open(img: HTMLImageElement) {
-    if (!lb || !lbImg) return;
+    const box = lb(), boxImg = lbImg();
+    if (!box || !boxImg) return;
     lastFocus = document.activeElement as HTMLElement | null;
-    lbImg.src = img.currentSrc || img.src;
+    boxImg.src = img.currentSrc || img.src;
     const alt = img.getAttribute('alt') ?? '';
-    lbImg.alt = alt;
-    if (lbCap) lbCap.textContent = alt;
-    lb.setAttribute('aria-label', alt || 'Enlarged image');
-    lb.hidden = false;
+    boxImg.alt = alt;
+    const cap = document.getElementById('lightbox-cap');
+    if (cap) cap.textContent = alt;
+    box.setAttribute('aria-label', alt || 'Enlarged image');
+    box.hidden = false;
     document.body.style.overflow = 'hidden';
-    lbClose?.focus();
+    box.querySelector<HTMLElement>('.lightbox-close')?.focus();
   }
   function close() {
-    if (!lb || !lbImg) return;
-    lb.hidden = true;
-    lbImg.src = '';
+    const box = lb(), boxImg = lbImg();
+    if (!box || !boxImg) return;
+    box.hidden = true;
+    boxImg.src = '';
     document.body.style.overflow = '';
     lastFocus?.focus();
   }
@@ -157,11 +228,13 @@ const year = new Date().getFullYear();
     const zoom = t.closest?.('img[data-zoom]') as HTMLImageElement | null;
     if (zoom) { open(zoom); return; }
     // Any click inside the open lightbox (backdrop, image, close button) closes.
-    if (lb && !lb.hidden && t.closest?.('#lightbox')) close();
+    const box = lb();
+    if (box && !box.hidden && t.closest?.('#lightbox')) close();
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lb && !lb.hidden) { close(); return; }
+    const box = lb();
+    if (e.key === 'Escape' && box && !box.hidden) { close(); return; }
     if (e.key === 'Enter' || e.key === ' ') {
       const el = document.activeElement as HTMLElement | null;
       if (el?.matches?.('img[data-zoom]')) {
@@ -170,6 +243,43 @@ const year = new Date().getFullYear();
       }
     }
   });
+
+  // One observer for the whole session; elements are handed to it per page.
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const en of entries) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in');
+          io.unobserve(en.target);
+        }
+      }
+    },
+    { rootMargin: '0px 0px -10% 0px' }
+  );
+
+  function arm() {
+    // Tells the head script the reveal machinery is alive (see its timeout).
+    document.documentElement.classList.add('js-ready');
+    // Mark charts and prose images (not nav/card thumbnails) as zoomable.
+    const zoomables = document.querySelectorAll<HTMLImageElement>(
+      'figure.chart img, .prose img'
+    );
+    for (const img of zoomables) {
+      if (img.dataset.zoom !== undefined) continue;
+      img.dataset.zoom = '';
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      const alt = img.getAttribute('alt') ?? '';
+      img.setAttribute('aria-label', alt ? `Enlarge image: ${alt}` : 'Enlarge image');
+    }
+    for (const el of document.querySelectorAll('.reveal:not(.in)')) io.observe(el);
+  }
+
+  // astro:page-load also fires on the first load, but arm() is idempotent and
+  // a .reveal that is never observed would stay at opacity 0 forever, so it is
+  // also called directly.
+  arm();
+  document.addEventListener('astro:page-load', arm);
 </script>
 
 <style>
@@ -193,9 +303,9 @@ const year = new Date().getFullYear();
     outline-offset: 2px;
   }
 
-  .nav-search { display: inline-block; margin-left: 1.1rem; }
+  .nav-search { display: inline-block; }
   .nav-search input {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: 0.85rem;
     color: var(--ink);
     background: var(--bg-soft);
@@ -204,15 +314,16 @@ const year = new Date().getFullYear();
     padding: 0.32rem 0.85rem;
     width: 12rem;
     max-width: 42vw;
-    transition: border-color 0.15s ease, width 0.15s ease;
+    transition: border-color 0.15s ease, background 0.15s ease;
   }
   .nav-search input:focus {
     outline: none;
     border-color: var(--accent);
     background: var(--bg);
   }
-  @media (max-width: 560px) {
-    .nav-search { display: block; margin: 0.6rem 0 0; width: 100%; }
+  @media (max-width: 620px) {
+    .site-header nav { flex-wrap: wrap; gap: 0.9rem 1.1rem; }
+    .nav-search { order: 1; flex: 1 1 100%; }
     .nav-search input { width: 100%; max-width: none; }
   }
 </style>
