@@ -14,6 +14,9 @@
   // Astro builds a fully static site (no adapter, no output mode set), so
   // this is an assets-only Worker with no script entry point.
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    // Astro emits dist/404.html; without this the asset router returns a bare
+    // 404 body instead of serving that page.
+    "not_found_handling": "404-page"
   }
 }

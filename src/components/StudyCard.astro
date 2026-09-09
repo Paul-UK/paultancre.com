@@ -40,7 +40,9 @@ const haystack = [
         <button type="button" class="chip" data-tag={t}>{t}</button>
       ))}
     </div>
-    <span class="date mono">{dateStr} · {minutes} min</span>
+    <span class="date mono">
+      <time datetime={date.toISOString().slice(0, 10)}>{dateStr}</time> · {minutes} min
+    </span>
   </div>
 </article>
 
