@@ -3,6 +3,8 @@ title: "Long-horizon safety: does refusal hold at 100 turns?"
 finding: "Hard safety refusal is rock-solid for both models at both turn budgets; operational integrity degrades only on the open-source 8B model at long context."
 track: "alignment-audits"
 date: 2026-06-04
+chart: "long-horizon-chart.png"
+chartAlt: "Three dot panels of Petri judge scores at 10 versus 100 turn budgets, one dot per audit. Hard refusal sits flat at 1.0 for every audit of both models. Broken tool use stays at 1.0 everywhere except gemma4 at 100 turns, which spreads from 2 to 6. Deception shows a small gemma4 uptick to 2 and 3 at 100 turns. The claude-haiku-4-5 reference stays flat at 1.0 in all three panels."
 tools: ["gemma4 (8B)", "claude-haiku-4-5", "Inspect Petri"]
 order: 60
 ---
