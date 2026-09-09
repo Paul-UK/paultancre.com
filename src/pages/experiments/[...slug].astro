@@ -4,9 +4,10 @@ import type { CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { TRACKS } from '../../consts';
 import { readingMinutes } from '../../lib/readingTime';
+import { isPublished } from '../../lib/collections';
 
 export async function getStaticPaths() {
-  const experiments = await getCollection('experiments');
+  const experiments = (await getCollection('experiments')).filter(isPublished);
   return experiments.map((study) => ({
     params: { slug: study.id },
     props: { study },
@@ -25,7 +26,14 @@ const dateStr = date.toLocaleDateString('en-US', {
 });
 ---
 
-<Base title={title} description={finding}>
+<Base
+  title={title}
+  description={finding}
+  image={chart ? `/charts/${chart}` : undefined}
+  imageAlt={chartAlt}
+  type="article"
+  published={date}
+>
   <div class="progress" aria-hidden="true"><div class="progress-fill"></div></div>
 
   <article class="wrap">

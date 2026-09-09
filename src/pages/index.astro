@@ -3,9 +3,10 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import StudyCard from '../components/StudyCard.astro';
 import { SITE_TITLE, SITE_TAGLINE, TRACKS } from '../consts';
+import { isPublished } from '../lib/collections';
 
 const all = (await getCollection('experiments'))
-  .filter((s) => !s.data.draft)
+  .filter(isPublished)
   .sort((a, b) => a.data.order - b.data.order || +b.data.date - +a.data.date);
 
 const trackKeys = Object.keys(TRACKS) as (keyof typeof TRACKS)[];
