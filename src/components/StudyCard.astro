@@ -7,8 +7,13 @@ interface Props {
   study: CollectionEntry<'experiments'>;
   /** Position within its track, used to stagger the scroll-in. */
   index?: number;
+  /** Past the homepage cap: folded away until its track is expanded. */
+  extra?: boolean;
+  /** Morph the title into the post's h1 on navigation. Only one card per
+      post on a page may do this, so duplicates (the Latest row) opt out. */
+  morph?: boolean;
 }
-const { study, index = 0 } = Astro.props;
+const { study, index = 0, extra = false, morph = true } = Astro.props;
 const { title, finding, chart, date, tools, track, startHere } = study.data;
 const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 const minutes = readingMinutes(study.body ?? '');
@@ -27,6 +32,7 @@ const haystack = [
   class:list={['card', 'reveal', { 'is-start': startHere }]}
   style={`--d:${(index * 0.07).toFixed(2)}s`}
   data-haystack={haystack}
+  data-extra={extra || undefined}
 >
   {startHere && <span class="start-badge" aria-hidden="true">Start here</span>}
   <a class="card-link" href={`/experiments/${study.id}/`}>
@@ -38,7 +44,9 @@ const haystack = [
     <div class="body">
       {/* Pairs with the h1 on the post page: the title morphs across the
           navigation instead of cross-fading with everything else. */}
-      <h3 transition:name={`study-title-${study.id}`}>{title}</h3>
+      {morph
+        ? <h3 transition:name={`study-title-${study.id}`}>{title}</h3>
+        : <h3>{title}</h3>}
       <p class="finding">{finding}</p>
     </div>
   </a>
@@ -64,6 +72,9 @@ const haystack = [
     overflow: hidden;
     background: var(--bg);
   }
+  /* display:flex above would otherwise beat the hidden attribute that the
+     homepage search sets on non-matching cards. */
+  .card[hidden] { display: none; }
   /* The reveal owns opacity/transform, so hover only touches border and shadow
      — otherwise the two transitions fight over the same properties. */
   .card:hover {

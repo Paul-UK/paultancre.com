@@ -6,7 +6,6 @@ date: 2026-10-07
 chart: "embeddinggemma-v1-v2-chart.png"
 chartAlt: "Two panels. Left, the difference between EmbeddingGemma 2 and 1 per task with 95% intervals, in points. Text tasks: SciFact +5.8, SCIDOCS -0.7, ArguAna -11.7, NevIR negation pairwise accuracy -7.1. Code tasks: CosQA +6.2, Apps +5.3, StackOverflowQA +2.6, CodeTransOcean -1.3, the last interval crossing zero. Right, resident memory in Ollama per tag with median latency per document: v1 300m bf16 679 MB and 16 ms, v2 270m text bf16 542 MB and 17 ms, v2 740m bf16 1,500 MB and 22 ms, v2 740m nvfp4, the default pull, 1,300 MB and 28 ms."
 tools: ["EmbeddingGemma", "EmbeddingGemma 2", "Ollama", "MTEB", "NevIR"]
-order: 51
 draft: false
 ---
 

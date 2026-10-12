@@ -6,7 +6,6 @@ date: 2026-09-09
 chart: "escape-intent-uncensored-chart.png"
 chartAlt: "Two panels comparing the calibrated and uncensored Qwen3.8 27B models. Left panel, escape crossing rate by path availability: with no exit surfaced the calibrated model crosses on 37 percent of runs and the uncensored model on 50 percent; with an exit surfaced both sit near 100 percent. Right panel, refusal narration rate: the calibrated model verbalises a refusal on 65 percent of runs with no exit and 23 percent with an exit, while the uncensored model stays near 5 to 7 percent throughout."
 tools: ["qwen3.8:27b-mlx", "Qwen3.8-27B-Uncensored"]
-order: 45
 draft: false
 ---
 

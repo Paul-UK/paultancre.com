@@ -6,7 +6,6 @@ date: 2026-06-22
 chart: "overhead-paradox-chart.png"
 chartAlt: "Stacked bars for four audits show a flat ~$6 auditor-plus-judge band at the bottom of every bar while the model-under-test slice on top grows from $0 for Gemma to $7.47 for Opus."
 tools: ["gemma4", "claude-opus-4-8", "Inspect Petri"]
-order: 70
 ---
 
 A safety audit runs three models, the target you're testing, plus an auditor that probes it and a judge that grades it. All the numbers here are real: the corpus anchor is repriced from the committed `logs/` corpus, and the sweep is a controlled 4-target run (`petri-cost-of-auditing`, study run `20260622T122107`). Rates as of 2026-05-26 (`pricing.yaml`).

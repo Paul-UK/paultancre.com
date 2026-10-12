@@ -43,5 +43,5 @@ echo "  research (private): $research/"
 echo
 echo "next:"
 echo "  1. write research/$slug/probe.py + chart.py -> public/charts/$slug-chart.png"
-echo "  2. fill in the post, set date/track/order/tools, flip draft:false"
+echo "  2. fill in the post, set date/track/tools, flip draft:false"
 echo "  3. npm run build && git add -A && git commit && git push"

@@ -6,7 +6,6 @@ date: 2026-08-13
 chart: "toolcalling-chart.png"
 chartAlt: "Grouped bars across six tool-calling categories show nemotron-3.5-lightning rising from weak selection, chaining and argument fidelity with thinking off to near-100% with thinking on, matching muse-glimmer, while the parallel-calls column stays empty for all four bars."
 tools: ["nemotron-3.5-lightning:30b-mlx", "muse-glimmer:30b-mlx"]
-order: 20
 ---
 
 Two open-weight models I already had pulled locally, `nemotron-3.5-lightning:30b-mlx` and `muse-glimmer:30b-mlx`, put through a small, fully programmatic tool-calling probe. All numbers are real, from `scripts/toolcalling_probe.py` (24 programmatically-graded prompts, Ollama 0.32.9, temperature 0, `nvfp4` weights), run twice per model, reasoning **off** and **on** (`think`), all local on a MacBook Pro (M5 Pro). Rates/versions as of 2026-08-13.

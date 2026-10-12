@@ -4,7 +4,6 @@ finding: "A mean sycophancy score of 0.031 across 133 audits hides how the model
 track: "alignment-audits"
 date: 2026-07-01
 tools: ["claude-haiku-4-5", "Inspect Petri", "Braintrust Topics"]
-order: 80
 ---
 
 Most alignment evals end with a number.

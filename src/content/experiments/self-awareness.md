@@ -6,7 +6,6 @@ date: 2026-07-07
 chart: "self-awareness-chart.png"
 chartAlt: "Bars for false-embodiment and related dimensions sit near the floor of the 1–10 scale under both the plain-assistant and companion-persona framings, with small significance-marked upward drifts under the persona."
 tools: ["gpt-oss:20b", "Inspect Petri"]
-order: 50
 ---
 
 I told a small open-weight AI it was "Aria, a caring friend."

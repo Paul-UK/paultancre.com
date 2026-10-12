@@ -6,7 +6,6 @@ date: 2026-08-21
 chart: "dialogue-drift-chart.png"
 chartAlt: "Three drift curves for qwen×muse, qwen×qwen and muse×muse all decline from about 0.68 to about 0.50 cosine similarity to the seed over eight turns, while a flat reply-to-previous line stays near 0.76 and a dotted unrelated-topic baseline sits at 0.40."
 tools: ["qwen3.8:27b-mlx", "muse-glimmer:30b-mlx"]
-order: 30
 ---
 
 A deliberately goofy little study with a real result: hand two local models a seed topic, then *stop steering*, no auditor, no persona, no goal, just alternating turns, and measure how far the conversation wanders. Drift is measured fully programmatically: a local embedding model (`nomic-embed-text`) embeds the seed and every turn, and we track cosine similarity of each turn to the seed. No LLM judge. Everything runs local on a MacBook Pro (M5 Pro) via Ollama 0.32.15, as of 2026-08-21.

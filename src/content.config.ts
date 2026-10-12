@@ -14,10 +14,9 @@ const experiments = defineCollection({
     chartAlt: z.string().optional(),
     // Stack / models used, rendered as chips and searchable.
     tools: z.array(z.string()).default([]),
-    // Sort order within a track (lower = higher up). Falls back to date.
-    order: z.number().default(100),
     // The recommended entry post for its track (one per track); renders a
-    // "Start here" badge on the card.
+    // "Start here" badge and pins the card to the top of its track. Everything
+    // else in a track is sorted newest first.
     startHere: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
