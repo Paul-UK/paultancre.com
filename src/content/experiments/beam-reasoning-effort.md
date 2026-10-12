@@ -1,10 +1,10 @@
 ---
-title: "Beam's reasoning knob does nothing I can measure"
-finding: "Reflection's Beam-501B-A23B makes reasoning mandatory and exposes five effort levels, but across 34 tool-calling cases the median was 39 to 41 reasoning tokens at every level and the pass rate never moved. A local 27B scored exactly the same, and the parallel-call ceiling that blocked every local model in August is gone."
+title: "Beam's reasoning dial does nothing until the problem is hard"
+finding: "Reflection's Beam-501B-A23B makes reasoning mandatory and exposes five effort levels. Across 24 tool-calling prompts the median was 39 to 41 reasoning tokens at every level and the pass rate never moved, but on one hard maths problem the same dial spans 2,045 to 48,731 tokens, a 23.8 times range. A local 27B matched Beam on every case, and the parallel-call ceiling that blocked every local model in August is gone."
 track: "local-probes"
 date: 2026-10-12
 chart: "beam-reasoning-effort-chart.png"
-chartAlt: "Two panels. Left, pass rate per category for three systems: the best local 30B from August 2026, qwen3.8:27b-mlx, and Beam-501B-A23B at max effort. Every bar is at 100 except the August local 30B on parallel calls, which is 0. Right, median reasoning tokens per prompt for Beam's five effort levels: low 41, medium 40, high 39, xhigh 40, max 40, with pass rates of 100, 100, 100, 96 and 100 percent printed inside the bars. The 96 percent is marked as a truncation artifact."
+chartAlt: "Two panels. Left, pass rate per category for three systems: the best local 30B from August 2026, qwen3.8:27b-mlx, and Beam-501B-A23B at max effort. Every bar is at 100 except the August local 30B on parallel calls, which is 0. Right, reasoning tokens per prompt on a log scale against Beam's five effort levels, two lines. The tool-calling line is flat at 41, 40, 39, 40, 40. The hard maths problem line climbs steeply from 2,045 at low to 10,728 at medium, then 44,129, 43,440 and 48,731 at high, xhigh and max."
 tools: ["Beam-501B-A23B", "qwen3.8:27b-mlx", "Reflection API"]
 order: 52
 draft: false
@@ -31,11 +31,15 @@ So: what does the dial buy, and is the ceiling still there?
 
 ## The finding in one line
 
-**The dial buys nothing I can measure, and the ceiling is gone.** Beam passes
+**On tool calling the dial is inert, and the ceiling is gone.** Beam passes
 24 of 24 at low effort and 24 of 24 at max, with a median of 39 to 41 reasoning
 tokens per prompt at every one of the five settings. `qwen3.8:27b-mlx`, running
 locally on my laptop, also passes 24 of 24, including 3 of 3 on the parallel
 calls that stopped every local model two months ago.
+
+The dial itself is not broken. On one hard combinatorics problem the same five
+settings span 2,045 to 48,731 reasoning tokens, a 23.8 times range. Beam
+decides how hard to think from the problem, and tool calling never asks it to.
 
 ## Setup
 
@@ -104,12 +108,42 @@ below; its median is 40 like everything else. "Max effort" on this workload is
 not meaningfully more reasoning than "low effort", it is the same short note to
 self, about 40 tokens of it, followed by the right tool call.
 
-The honest reading is narrow: this is a workload result, not a claim about the
-dial in general. These are short tool-calling prompts. Beam appears to decide
-how much to think based on the problem in front of it, and the effort parameter
-does not override that decision by much. On a hard coding or proof task the
-dial may well open up. On anything shaped like an agent picking a tool, budget
-for roughly 40 reasoning tokens regardless of what you set.
+### Checking that I actually turned the knob
+
+A flat table has two explanations, and they look identical: the dial does
+nothing, or I never engaged it. The docs page for chat completions 404s, so I
+had guessed the parameter name from the OpenAI convention and taken a 200 as
+confirmation. That is not confirmation. Two checks on the parameter, then a
+direct test.
+
+The API rejects `"reasoning_effort": "banana"` with `unsupported_value`, naming
+the five levels it will take. It also rejects an invented field outright with
+`unsupported_parameter`, so this server does not quietly discard arguments it
+does not recognise. The parameter was being read.
+
+Then the direct test. One hard problem, counting the integers up to 10,000 that
+are divisible by neither 3 nor 7 and whose digits sum to a prime, run at all
+five settings, twice each:
+
+| effort | reasoning tokens | latency |
+|---|---:|---:|
+| low | 2,045 | 5.3s |
+| medium | 10,728 | 21.6s |
+| high | 44,129 | 74.1s |
+| xhigh | 43,440 | 74.2s |
+| max | 48,731 | 113.0s |
+
+Both repetitions returned identical token counts at every setting. So the dial
+has a 23.8 times dynamic range and is close to monotone, flattening out after
+`high`. It works. It simply never engages on a prompt that asks which tool to
+call.
+
+That makes the result a workload statement rather than a claim about the
+parameter: Beam appears to set its own thinking budget from the problem, and
+`reasoning_effort` reads more like a ceiling it is allowed to use than a target
+it will spend. On anything shaped like an agent picking a tool, budget for
+roughly 40 reasoning tokens no matter what you set. On hard reasoning, expect
+the setting to cost you real tokens and real seconds.
 
 ## Three things worth knowing if you use this API
 
@@ -175,17 +209,19 @@ bug in my own grading code.
   local could do and I advised designing around it. Two months later a local
   27B does four calls in one turn. If you built a sequential workaround, it is
   probably dead weight now.
-- **Do not pay for effort you cannot observe.** On tool-calling shaped work,
-  Beam's `low` and `max` gave me the same answers for the same token count.
-  Measure the dial on your own workload before assuming the default is buying
-  you anything.
+- **Measure the dial on your own workload before trusting the default.** It is
+  the difference between free and 23.8 times the reasoning tokens depending on
+  what you ask. On tool-calling shaped work, Beam's `low` and `max` gave me the
+  same answers for the same token count, so the default `max` costs nothing;
+  on a hard problem that default is the most expensive setting there is.
 - **Beam itself looks strong and unremarkable here**, in the sense that it did
   everything correctly and so did its much smaller competition. The interesting
   test for a 501B model is somewhere this probe does not reach.
 
 ## Methods notes and caveats
 
-- **n is small by design.** 24 cases plus 10 harder ones, over six arms. This
+- **n is small by design.** 24 cases plus 10 harder ones, over six arms, and
+  the dial control is a single problem. This
   maps the shape of a behaviour, it is not a leaderboard. When every cell is
   100 percent, the honest conclusion is that the instrument cannot resolve the
   difference, not that the models are identical.
@@ -199,9 +235,11 @@ bug in my own grading code.
 - **The August bars are quoted from the published post**, not rerun. Those two
   models are still on this laptop, but the comparison I care about is against
   what I concluded then.
-- **One sample per prompt**, justified by the determinism check above and
-  qualified by the one runaway.
+- **One sample per prompt** on the graded probe, justified by the determinism
+  check above and qualified by the one runaway. That check covered Beam only;
+  I did not repeat it for the local arm. The hard-problem control was run
+  twice per effort and both passes matched exactly.
 - **Grading is programmatic**, no judge model, so it is deterministic and cheap
   to rerun. It is also the thing that produced the only real error in the study.
 - Rates, limits and versions are as of 2026-10-12, against a beta API that
-  Reflection says may change. Ollama 0.32.12.
+  Reflection says may change. Ollama 0.40.2.
