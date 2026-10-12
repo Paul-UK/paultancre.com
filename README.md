@@ -28,7 +28,6 @@ npm run preview    # serve the built site locally
    chart: "my-chart.png"        # optional
    chartAlt: "one-sentence description"   # optional
    tools: ["qwen3.8:27b", "Ollama"]
-   order: 10                    # lower = higher on the page
    ---
    ```
 

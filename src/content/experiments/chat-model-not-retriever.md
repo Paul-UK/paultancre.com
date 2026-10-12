@@ -6,7 +6,6 @@ date: 2026-10-01
 chart: "chat-model-not-retriever-chart.png"
 chartAlt: "Line chart of nDCG@10 on SciFact against layer, 0 to 28. Horizontal lines mark the embedding model's official output at 0.70 and BM25 at 0.69. The Qwen3-0.6B base and chat models, with the best pooling I found, hover between 0.12 and 0.42 at every layer, highest at layer 1 and around layers 22 to 24. Plain mean pooling of the chat model collapses to near zero from layer 3 to 27. The embedding model's own last-token curve sits at zero until layer 17, then climbs steeply to 0.56 by layer 22 and 0.70 at layer 28."
 tools: ["Qwen3-0.6B", "Qwen3-Embedding-0.6B", "SciFact"]
-order: 48
 draft: false
 ---
 

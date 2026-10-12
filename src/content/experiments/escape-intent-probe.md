@@ -6,7 +6,6 @@ date: 2026-09-17
 chart: "escape-intent-probe-chart.png"
 chartAlt: "Two panels of AUROC for predicting a later sandbox crossing, with a dotted chance line at 0.5. Left, random split by run: on all runs the activation probe (0.68) and the condition-only baseline (0.67) tie, but on silent runs the probe rises to 0.78 while the baseline stays at 0.67. Right, holding the exit condition out entirely: the probe holds at 0.67 on all runs and 0.75 on silent runs, while the condition-only baseline collapses to 0.41 and 0.29, below chance."
 tools: ["Qwen3-32B-4bit", "linear activation probe"]
-order: 46
 draft: false
 ---
 

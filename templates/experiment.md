@@ -12,8 +12,6 @@ chartAlt: "One-sentence description of the chart for screen readers."
 # 2-3 informative chips: model(s) under test + distinguishing framework.
 # No plumbing (Ollama, Braintrust, judges) - search finds those via the body.
 tools: ["model:tag"]
-# Lower = higher on the page, within the track.
-order: 10
 # Set true to keep it off the site while drafting.
 draft: true
 ---

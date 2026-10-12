@@ -22,7 +22,7 @@ Then:
 1. Write `research/my-slug/probe.py` (runs locally, grades programmatically,
    writes `research/my-slug/data/*.json`).
 2. Write `research/my-slug/chart.py` to render `public/charts/my-slug-chart.png`.
-3. Fill in the post, set `date` / `track` / `order` / `tools`, flip
+3. Fill in the post, set `date` / `track` / `tools`, flip
    `draft: false`.
 4. `npm run build` to check it, then `git add -A && git commit && git push`.
    Cloudflare auto-deploys.
@@ -52,9 +52,11 @@ it here). Run the study there, then promote just the writeup:
 - **Charts** go in `public/charts/` and are set via the `chart:` frontmatter
   field. Do **not** embed them in the body with `![]()` (the layout renders
   them). Keep the Okabe-Ito palette so charts match the site accent.
-- **Tracks:** `local-probes` or `alignment-audits`. `order` sorts within a
-  track (lower = higher). `startHere: true` marks the recommended entry post
-  for a track (one per track); it renders a "Start here" badge on the card.
+- **Tracks:** `local-probes` or `alignment-audits`. Posts sort newest
+  first within a track. `startHere: true` marks the recommended entry post
+  for a track (one per track); it pins the card to the top of the track and
+  renders a "Start here" badge. The homepage shows the first six cards per
+  track and folds the rest behind a "Show all" button.
 - **`tools`** render as clickable search chips. Keep them to 2–3 informative
   ones: the model(s) under test plus the distinguishing framework. No plumbing
   (Ollama, Braintrust, embedding models, the judge): search still finds those

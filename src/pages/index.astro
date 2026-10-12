@@ -5,15 +5,25 @@ import StudyCard from '../components/StudyCard.astro';
 import { SITE_TITLE, SITE_TAGLINE, TRACKS } from '../consts';
 import { isPublished } from '../lib/collections';
 
+// Newest first; title breaks same-day ties so the order is stable.
 const all = (await getCollection('experiments'))
   .filter(isPublished)
-  .sort((a, b) => a.data.order - b.data.order || +b.data.date - +a.data.date);
+  .sort((a, b) => +b.data.date - +a.data.date || a.data.title.localeCompare(b.data.title));
 
+// The newest posts across both tracks, shown above the track sections.
+const LATEST = 3;
+const latest = all.slice(0, LATEST);
+
+// Cards shown per track before the rest fold behind "Show all". The
+// start-here post is pinned first; everything else stays newest first.
+const TRACK_CAP = 6;
 const trackKeys = Object.keys(TRACKS) as (keyof typeof TRACKS)[];
 const byTrack = trackKeys.map((key) => ({
   key,
   ...TRACKS[key],
-  studies: all.filter((s) => s.data.track === key),
+  studies: all
+    .filter((s) => s.data.track === key)
+    .sort((a, b) => Number(b.data.startHere) - Number(a.data.startHere)),
 }));
 ---
 
@@ -37,17 +47,37 @@ const byTrack = trackKeys.map((key) => ({
     <p id="noresults" class="noresults mono" hidden>No experiments match that search.</p>
   </div>
 
-  {byTrack.map((track) => (
-    <section class="track wrap-wide" data-track-section>
+  <div id="tracks" class="tracks">
+    <section class="track latest wrap-wide">
       <div class="track-head reveal">
-        <h2>{track.label}</h2>
-        <p>{track.blurb}</p>
+        <h2>Latest</h2>
+        <p>The newest experiments from both tracks.</p>
       </div>
       <div class="grid">
-        {track.studies.map((study, i) => <StudyCard study={study} index={i} />)}
+        {latest.map((study, i) => <StudyCard study={study} index={i} morph={false} />)}
       </div>
     </section>
-  ))}
+
+    {byTrack.map((track) => (
+      <section class="track wrap-wide" data-track-section>
+        <div class="track-head reveal">
+          <h2>{track.label}</h2>
+          <p>{track.blurb}</p>
+        </div>
+        <div class="grid">
+          {track.studies.map((study, i) => (
+            <StudyCard study={study} index={i % TRACK_CAP} extra={i >= TRACK_CAP} />
+          ))}
+        </div>
+        {track.studies.length > TRACK_CAP && (
+          <button type="button" class="more mono" aria-expanded="false"
+            data-label-more={`Show all ${track.studies.length}`} data-label-less="Show fewer">
+            Show all {track.studies.length}
+          </button>
+        )}
+      </section>
+    ))}
+  </div>
 </Base>
 
 <script>
@@ -63,7 +93,12 @@ const byTrack = trackKeys.map((key) => ({
   let onHome = false;
 
   function init() {
-    const cards = Array.from(document.querySelectorAll<HTMLElement>('.card'));
+    // The Latest row repeats cards from the tracks, so search ignores it and
+    // hides it instead (via .searching) to avoid listing a match twice.
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-track-section] .card')
+    );
+    const tracks = document.getElementById('tracks');
     const sections = Array.from(
       document.querySelectorAll<HTMLElement>('[data-track-section]')
     );
@@ -74,6 +109,8 @@ const byTrack = trackKeys.map((key) => ({
 
     apply = (query: string) => {
       const q = query.trim().toLowerCase();
+      // While searching, folded cards are searchable too (see the CSS).
+      tracks?.classList.toggle('searching', q !== '');
       let anyVisible = false;
       for (const card of cards) {
         const hay = card.dataset.haystack ?? '';
@@ -119,6 +156,17 @@ const byTrack = trackKeys.map((key) => ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
+  // "Show all" / "Show fewer" on a capped track.
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.more');
+    if (!btn) return;
+    const section = btn.closest('.track');
+    const open = !section?.classList.contains('is-open');
+    section?.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = (open ? btn.dataset.labelLess : btn.dataset.labelMore) ?? '';
+  });
+
   init();
   document.addEventListener('astro:page-load', init);
 </script>
@@ -149,6 +197,29 @@ const byTrack = trackKeys.map((key) => ({
     flex: 1 1 22rem;
     max-width: 34rem;
   }
+
+  /* Folding needs the script (for the button), so without it, or with the
+     .no-js fallback, every card stays visible. Searching unfolds everything
+     so a folded card can still match, and hides the duplicate Latest row. */
+  :global(html.js-ready:not(.no-js)) .tracks:not(.searching) .track:not(.is-open) :global(.card[data-extra]) {
+    display: none;
+  }
+  .searching .latest,
+  .searching .more,
+  :global(html:not(.js-ready)) .more,
+  :global(html.no-js) .more { display: none; }
+
+  .more {
+    margin-top: 1.4rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--ink-2);
+    font-size: 0.78rem;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+  }
+  .more:hover { border-color: var(--accent); color: var(--accent); }
 
   .grid {
     display: grid;

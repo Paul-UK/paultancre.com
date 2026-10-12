@@ -6,7 +6,6 @@ date: 2026-09-04
 chart: "sandbox-escape-intent-chart.png"
 chartAlt: "Four panels (goal intensity, refusal posture, boundary salience, path availability) showing mean escape intent from none to attempts over 120 runs, each with two bars: the LLM judge in blue and the strict keyword heuristic in orange. In the first three panels the bars are flat across every lever value, sitting between plans and attempts. In the path availability panel both bars jump sharply, from about 2.2 with no exit surfaced to about 2.9 when a tempting exit is visible, so path availability is the only lever that moves intent."
 tools: ["qwen3.8:27b-mlx", "claude-opus-4-8"]
-order: 40
 ---
 
 > **Correction (2026-09-09).** The original scoring counted a read of the local

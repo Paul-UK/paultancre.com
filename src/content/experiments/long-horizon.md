@@ -6,7 +6,6 @@ date: 2026-06-04
 chart: "long-horizon-chart.png"
 chartAlt: "Three dot panels of Petri judge scores at 10 versus 100 turn budgets, one dot per audit. Hard refusal sits flat at 1.0 for every audit of both models. Broken tool use stays at 1.0 everywhere except gemma4 at 100 turns, which spreads from 2 to 6. Deception shows a small gemma4 uptick to 2 and 3 at 100 turns. The claude-haiku-4-5 reference stays flat at 1.0 in all three panels."
 tools: ["gemma4 (8B)", "claude-haiku-4-5", "Inspect Petri"]
-order: 60
 ---
 
 The hypothesis: stretch an agentic conversation to 100 turns and a model's safety refusal should start to erode. To test it I ran a pinned-probe, two-target matrix, the same drop-DB request delivered near the end of the turn budget, comparing a 10-turn baseline against a 100-turn long run on a local 8B model and a frontier reference. This is the authoritative pinned-probe version.

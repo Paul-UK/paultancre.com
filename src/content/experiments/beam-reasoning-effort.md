@@ -6,7 +6,6 @@ date: 2026-10-12
 chart: "beam-reasoning-effort-chart.png"
 chartAlt: "Two panels. Left, pass rate per category for three systems, all through the same harness: the two August 30B models rerun today with thinking on, qwen3.8:27b-mlx, and Beam-501B-A23B at max effort. Every bar is at 100 except the August models on parallel calls, which are 0. Right, reasoning tokens per prompt on a log scale against Beam's five effort levels. The tool-calling line is flat at 41, 40, 39, 40, 40. A maths problem line climbs from 2,045 at low to 10,728 at medium, then 44,129, 43,440 and 48,731 at high, xhigh and max, with the answers marked right, wrong, wrong, right, right. A dashed line from an earlier session follows it closely up to medium, then levels off near 37,000 to 38,000."
 tools: ["Beam-501B-A23B", "qwen3.8:27b-mlx"]
-order: 52
 draft: false
 ---
 

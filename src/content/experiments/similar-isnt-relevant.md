@@ -6,7 +6,6 @@ date: 2026-10-01
 chart: "similar-isnt-relevant-chart.png"
 chartAlt: "Two panels. Left, NevIR pairwise accuracy with 95% intervals and a dotted line marking random guessing at 25%: BM25 keywords 2.2%, chat model layer 1 11.4%, chat model layer 22 15.2%, embedding model 13.2%, reranker 36.8%. Only the reranker clears the chance line. Right, a histogram on a log scale of cosine similarity under the embedding model: a document against an unrelated document clusters around 0.2 to 0.3, while a document against its negated twin piles up just below 1.0, median 0.997 versus 0.23."
 tools: ["Qwen3-Embedding-0.6B", "Qwen3-Reranker-0.6B", "NevIR"]
-order: 49
 draft: false
 ---
 
