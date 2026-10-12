@@ -1,6 +1,6 @@
 ---
 title: "Beam's reasoning dial barely moves on tool calling"
-finding: "Reflection's Beam-501B-A23B always reasons and offers five effort levels. On 24 tool-calling prompts the median stayed at 39 to 41 reasoning tokens at every level and the pass rate did not change, while on one maths problem the same dial moved reasoning 18 to 24 times. A local 27B matched Beam on every tool-calling case, including the parallel calls that both of my August test models still fail."
+finding: "Reflection's Beam-501B-A23B always reasons and offers five effort levels. On 24 tool-calling prompts the median stayed at 39 to 41 reasoning tokens at every level and the pass rate stayed at 23 or 24 of 24, while on one maths problem the same dial moved reasoning 18 to 24 times. A local 27B matched Beam on every tool-calling case, including the parallel calls that both of my August test models still fail."
 track: "local-probes"
 date: 2026-10-12
 chart: "beam-reasoning-effort-chart.png"
@@ -129,7 +129,9 @@ more. That is a small rise from a small base, not nothing.
 
 On latency I can't conclude anything. Max has the highest median, but the middle
 half of calls spans 0.58 to 1.03 seconds at low and 0.63 to 1.06 at max. Each
-level ran once, at a different time, on a shared service. I can't tell whether
+level ran at a different time on a shared service, and my harness retried
+silently on server errors without logging it, so the few calls that took 3 to
+7 seconds may include a retry. I can't tell whether
 max is slower on these prompts.
 
 ### Was the dial actually doing anything?
@@ -180,10 +182,12 @@ problem.
 needs each earlier assistant message returned with its `reasoning_content`
 field, or the request fails with a 400. The docs say so: "During tool calling,
 return the assistant message with its `tool_calls` and `reasoning_content`
-unchanged." With the official OpenAI Python
-SDK (version 2.33) this just works if you append the message object it returns,
-or its `model_dump()`. It fails if you rebuild the message by hand from only the
-text and the tool calls, which is what my first version of the probe did.
+unchanged." With the official OpenAI Python SDK (version 2.33) this just works
+if you append the message object it returns, or
+`model_dump(exclude_none=True)`. A plain `model_dump()` fails, because it
+includes empty fields the server rejects, and so does rebuilding the message by
+hand from only the text and the tool calls, which is what my first version of
+the probe did.
 
 **Temperature 0 is not fully deterministic.** Three identical calls on one
 prompt gave identical tool calls and token counts, which is why I ran each
@@ -221,7 +225,7 @@ Beam's one runaway and my own grading code.
 
 - **This probe no longer separates current models.** It still separates the
   August models from today's, but a 501B served model and a 27B on a laptop are
-  identical on it. Tool calling is not where these two differ, if they differ.
+  identical on it. On these prompts, tool calling is not where they differ.
 - **Parallel calls need a newer model, not just a newer Ollama.** On today's
   Ollama, the two August models still can't do them with thinking on, and qwen3.8
   does them reliably, up to four calls in one turn. I can't run qwen3.8 on
@@ -239,27 +243,33 @@ Beam's one runaway and my own grading code.
   problem. This maps the shape of a behaviour; it is not a leaderboard.
 - **Asymmetries between the two arms.** Each of these could matter on a probe
   that isn't saturated:
-  - *Reasoning level.* Beam ran at max, qwen3.8 at medium. That favours Beam.
+  - *Reasoning level.* Beam ran at max, qwen3.8 at medium. That presumably
+    favours Beam, although Beam's own level made no difference on these prompts.
   - *Precision.* qwen3.8 is a 4-bit build. Reflection doesn't say how Beam is
     served; my guess is higher precision, which would favour Beam.
   - *Tool-call parsing.* Ollama's template parses qwen3.8's calls and
     Reflection's own code parses Beam's. My grader only sees the parsed result,
     and I don't know which parser is more forgiving.
   - *Chained turns.* On a chain's second turn, Beam got its earlier reasoning
-    back, as its API requires. I sent the same field to Ollama, which names that
-    field differently and probably ignored it, so qwen3.8 likely didn't see its
-    earlier reasoning. All chains passed on both, so it changed no result here.
+    back, as its API requires. I sent the same field to Ollama, which ignores it:
+    the prompt was 515 tokens with or without it, and 571 when I used Ollama's
+    own `reasoning` field instead. So qwen3.8 did not see its earlier reasoning.
+    All chains passed on both, and with the field qwen3.8 made the same call, so
+    it changed no result here.
   - *Latency.* Beam runs on Reflection's hardware and qwen3.8 on an M5 Pro, so I
     don't compare latency across the two.
 - **The August models were rerun, not quoted.** Ollama went from 0.32.9 to
   0.40.2 between the two posts, and its templates or tool parsing may have
-  changed. Both models are still installed as the same `nvfp4` builds. With
+  changed. Both models are still installed under the same tags, with the same
+  architecture, parameter count and `nvfp4` quantization. Nemotron's pull date
+  fits the August run; muse-glimmer was pulled again in early September, so it
+  may not be the identical build. With
   thinking on, both still score 0 of 3 on parallel calls, matching August
   exactly, while qwen3.8 scores 3 of 3 through the same code. With thinking off,
   things differ from August: muse-glimmer now passes the Berlin and Rome case,
   consistently over three reruns, and nemotron scores 75 percent overall against
-  August's 54. I can't say whether that comes from the newer Ollama or from my
-  rebuilt prompts, so I only compare the thinking-on parallel results across the
+  August's 54. That could be the newer Ollama, my rebuilt prompts, or for
+  muse-glimmer a different build. I can't tell which, so I only compare the thinking-on parallel results across the
   two dates.
 - **No reasoning-off run of Beam exists.** Beam can't switch reasoning off, so
   the August on and off comparison can't be repeated for it.
