@@ -4,7 +4,7 @@ finding: "Reflection's Beam-501B-A23B makes reasoning mandatory and exposes five
 track: "local-probes"
 date: 2026-10-12
 chart: "beam-reasoning-effort-chart.png"
-chartAlt: "Two panels. Left, pass rate per category for three systems: the best local 30B from August 2026, qwen3.8:27b-mlx, and Beam-501B-A23B at max effort. Every bar is at 100 except the August local 30B on parallel calls, which is 0. Right, reasoning tokens per prompt on a log scale against Beam's five effort levels, two lines. The tool-calling line is flat at 41, 40, 39, 40, 40. The hard maths problem line climbs steeply from 2,045 at low to 10,728 at medium, then 44,129, 43,440 and 48,731 at high, xhigh and max."
+chartAlt: "Two panels. Left, pass rate per category for three systems: the two August 30B models rerun today with thinking on, qwen3.8:27b-mlx, and Beam-501B-A23B at max effort, all through the same harness. Every bar is at 100 except the August models on parallel calls, which are still 0. Right, reasoning tokens per prompt on a log scale against Beam's five effort levels, two lines. The tool-calling line is flat at 41, 40, 39, 40, 40. The hard maths problem line climbs steeply from 2,045 at low to 10,728 at medium, then 44,129, 43,440 and 48,731 at high, xhigh and max."
 tools: ["Beam-501B-A23B", "qwen3.8:27b-mlx", "Reflection API"]
 order: 52
 draft: false
@@ -82,9 +82,13 @@ Everything passes.
 | Beam, xhigh | 6/6 | 5/6\* | 3/3 | 2/2 | 4/4 | 3/3 | **23/24** |
 | Beam, max (default) | 6/6 | 6/6 | 3/3 | 2/2 | 4/4 | 3/3 | **24/24** |
 | qwen3.8:27b-mlx | 6/6 | 6/6 | 3/3 | 2/2 | 4/4 | 3/3 | **24/24** |
-| *nemotron, Aug, thinking on* | *6/6* | *6/6* | *0/3* | *2/2* | *4/4* | *3/3* | *21/24* |
+| *nemotron, rerun today, thinking on* | *6/6* | *6/6* | *0/3* | *2/2* | *4/4* | *3/3* | *21/24* |
+| *muse-glimmer, rerun today, thinking on* | *6/6* | *6/6* | *0/3* | *2/2* | *4/4* | *3/3* | *21/24* |
 
 \* A truncation artifact, not a miss. More on it below.
+
+The two italic rows are the August models, rerun today through this harness and
+this Ollama build. More on why below.
 
 The primary endpoint is a tie with zero discordant pairs. There is no pair to
 run a test on.
@@ -205,10 +209,12 @@ bug in my own grading code.
   anything.** It is saturated. A 501B frontier MoE and a 27B model on a laptop
   are indistinguishable on it. That is a statement about the probe, and about
   how fast the floor has risen, more than about either model.
-- **The parallel-call ceiling is gone.** In August it was the one thing nothing
-  local could do and I advised designing around it. Two months later a local
-  27B does four calls in one turn. If you built a sequential workaround, it is
-  probably dead weight now.
+- **The parallel-call ceiling is gone, if you change models.** In August it was
+  the one thing nothing local could do and I advised designing around it. A
+  current local 27B does four calls in one turn. The August models still cannot,
+  so the fix came from newer models, not from an Ollama update. If you built a
+  sequential workaround for an older model, check whether you still need the
+  model before you drop the workaround.
 - **Measure the dial on your own workload before trusting the default.** It is
   the difference between free and 23.8 times the reasoning tokens depending on
   what you ask. On tool-calling shaped work, Beam's `low` and `max` gave me the
@@ -232,9 +238,27 @@ bug in my own grading code.
 - **No reasoning-off arm exists.** Beam cannot disable reasoning, so the August
   on/off contrast is impossible to reproduce by construction, rather than
   something I chose to skip.
-- **The August bars are quoted from the published post**, not rerun. Those two
-  models are still on this laptop, but the comparison I care about is against
-  what I concluded then.
+- **The August models were rerun, not quoted.** Between August and now Ollama
+  went from 0.32.9 to 0.40.2, and its chat templates and tool-call parsing
+  changed along the way. So "the ceiling is gone" could have meant the software
+  got better, not the models. Both August models are still on this laptop as
+  the same `nvfp4` builds, so I ran them through this harness on 0.40.2. With
+  thinking on, both still score 0 of 3 on parallel calls, while qwen3.8 scores
+  3 of 3 through the identical pipeline. The ceiling sat in the models.
+  One honest wrinkle: with thinking off, muse-glimmer now passes the
+  Berlin and Rome case, stable across three reruns, where August had it at 0
+  of 3. I cannot tell whether that is the newer Ollama or the small
+  differences between my rebuilt prompts and the originals. The thinking-off
+  overall scores also moved (nemotron 75 percent against August's 54) for the
+  same reason, so I only compare the parallel row across the two dates.
+- **The API arm has advantages I cannot see or remove.** qwen3.8 runs as a
+  4-bit build. Reflection does not say what precision Beam is served at, and
+  it is very likely higher. Each side also parses tool calls with its own
+  code, Ollama's chat template on one and Reflection's parser on the other,
+  and my grader only sees the result. A lenient parser can rescue a malformed
+  call that a strict one drops. Every case passed on both sides, so none of
+  this decided anything here, but every one of these favours Beam. A local
+  model that ties a served model under those conditions has not been flattered.
 - **One sample per prompt** on the graded probe, justified by the determinism
   check above and qualified by the one runaway. That check covered Beam only;
   I did not repeat it for the local arm. The hard-problem control was run
