@@ -14,8 +14,7 @@ Reflection put [Beam](https://reflection.ai/blog/introducing-beam) behind a beta
 API on October 5. In Reflection's words it is "a sparse Mixture-of-Experts model
 with 501 billion total parameters, 23 billion active", "built for coding,
 reasoning, and agentic workloads", and "This month, we will release the weights
-under an Apache 2.0 license". On October 12 I could not find them on Hugging
-Face, so for now I could only run Beam through the API.
+under an Apache 2.0 license".
 
 Two things about the API made me want to point my August tool-calling probe at
 it.
@@ -200,8 +199,8 @@ it happened once. Add the cross-session drift on the maths problem. If you run
 Beam unattended, check `finish_reason`.
 
 **Rate limits.** The response headers allowed 90 requests a minute, 20,000 a
-day and 10 million tokens a minute. I found no pricing page in the docs. All 302
-graded calls in this study, plus reruns, fit in a fraction of one day's limit.
+day and 10 million tokens a minute. All 302 graded calls in this study, plus
+reruns, fit in a fraction of one day's limit.
 
 ## A harder tier, which also came back full marks
 
