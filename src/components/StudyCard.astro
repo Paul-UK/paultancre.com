@@ -34,7 +34,6 @@ const haystack = [
   data-haystack={haystack}
   data-extra={extra || undefined}
 >
-  {startHere && <span class="start-badge" aria-hidden="true">Start here</span>}
   <a class="card-link" href={`/experiments/${study.id}/`}>
     {chart && (
       <div class="thumb">
@@ -56,15 +55,17 @@ const haystack = [
         <button type="button" class="chip" data-tag={t}>{t}</button>
       ))}
     </div>
-    <span class="date mono">
-      <time datetime={date.toISOString().slice(0, 10)}>{dateStr}</time> · {minutes} min
-    </span>
+    <div class="meta">
+      {startHere && <span class="start-badge">Start here</span>}
+      <span class="date mono">
+        <time datetime={date.toISOString().slice(0, 10)}>{dateStr}</time> · {minutes} min
+      </span>
+    </div>
   </div>
 </article>
 
 <style>
   .card {
-    position: relative;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
@@ -82,11 +83,15 @@ const haystack = [
     box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.45);
   }
   .card.is-start { border-color: var(--accent); }
+  /* Sits above the date rather than over the thumbnail, where it hid the
+     chart's own title. */
+  .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+  }
   .start-badge {
-    position: absolute;
-    top: 0.6rem;
-    left: 0.6rem;
-    z-index: 1;
     font-family: var(--font-mono);
     font-size: 0.66rem;
     letter-spacing: 0.03em;
@@ -94,7 +99,7 @@ const haystack = [
     color: var(--bg);
     border-radius: 999px;
     padding: 0.18rem 0.6rem;
-    pointer-events: none;
+    white-space: nowrap;
   }
   .card-link { text-decoration: none; color: inherit; }
   .card-link:hover { text-decoration: none; }
