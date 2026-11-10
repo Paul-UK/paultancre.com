@@ -91,5 +91,3 @@ A single-repo Python pipeline with one SQLite file, hosted model APIs, and a pap
 The scores are published: all 22,380 stock-days and 55,480 per-model scores with the models' written reasoning, plus a script that rebuilds the first table, at [huggingface.co/datasets/PaulT/live-llm-stock-scores](https://huggingface.co/datasets/PaulT/live-llm-stock-scores). Prompts are not included because they embed licensed news text, and prices are not included either; the script fetches its own.
 
 The pipeline code is private. This write-up and the dataset are meant to give enough to rerun the test.
-
-The ideas and experiments here are mine, built with AI assistance.
