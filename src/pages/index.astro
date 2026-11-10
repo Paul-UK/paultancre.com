@@ -10,7 +10,7 @@ const all = (await getCollection('experiments'))
   .filter(isPublished)
   .sort((a, b) => +b.data.date - +a.data.date || a.data.title.localeCompare(b.data.title));
 
-// The newest posts across both tracks, shown above the track sections.
+// The newest posts across all tracks, shown above the track sections.
 const LATEST = 3;
 const latest = all.slice(0, LATEST);
 
@@ -34,12 +34,13 @@ const byTrack = trackKeys.map((key) => ({
     <p class="tagline lede fade" style="--d:0.2s">{SITE_TAGLINE}</p>
     <p class="intro fade" style="--d:0.34s">
       Each post is a small, self-contained experiment with a real result: the
-      chart, the method, and the numbers behind it. Two threads run through
+      chart, the method, and the numbers behind it. Three threads run through
       the lab, and they read differently on purpose. <strong>Local-model
       probes</strong> are quick, fully programmatic experiments on open-weight
       models running on a laptop. <strong>Alignment audits</strong> are slower,
       multi-turn adversarial studies of safety behavior, scored by a frontier
-      judge.
+      judge. <strong>Live systems</strong> are post-mortems of things I ran
+      for real, with hosted frontier models against live conditions.
     </p>
   </section>
 
@@ -51,7 +52,7 @@ const byTrack = trackKeys.map((key) => ({
     <section class="track latest wrap-wide">
       <div class="track-head reveal">
         <h2>Latest</h2>
-        <p>The newest experiments from both tracks.</p>
+        <p>The newest experiments from all tracks.</p>
       </div>
       <div class="grid">
         {latest.map((study, i) => <StudyCard study={study} index={i} morph={false} />)}

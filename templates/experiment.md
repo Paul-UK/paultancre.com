@@ -3,7 +3,8 @@ title: "TITLE HERE"
 # One sentence, the headline result. Plain text, no markdown. Shows on the card
 # and at the top of the post.
 finding: "ONE-LINE FINDING HERE."
-# "local-probes" (laptop, programmatic) or "alignment-audits" (Petri + judges).
+# "local-probes" (laptop, programmatic), "alignment-audits" (Petri + judges)
+# or "live-systems" (post-mortems of systems run for real).
 track: "local-probes"
 date: 2026-01-01
 # Chart filename under public/charts/ (omit both lines if there is no chart).
