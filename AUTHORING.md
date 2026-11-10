@@ -52,7 +52,8 @@ it here). Run the study there, then promote just the writeup:
 - **Charts** go in `public/charts/` and are set via the `chart:` frontmatter
   field. Do **not** embed them in the body with `![]()` (the layout renders
   them). Keep the Okabe-Ito palette so charts match the site accent.
-- **Tracks:** `local-probes` or `alignment-audits`. Posts sort newest
+- **Tracks:** `local-probes`, `alignment-audits` or `live-systems`
+  (post-mortems of systems run for real, hosted models, live conditions). Posts sort newest
   first within a track. `startHere: true` marks the recommended entry post
   for a track (one per track); it pins the card to the top of the track and
   renders a "Start here" badge. The homepage shows the first six cards per

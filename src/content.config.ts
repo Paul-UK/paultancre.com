@@ -7,7 +7,7 @@ const experiments = defineCollection({
     title: z.string(),
     // One-line finding, shown on cards and at the top of the post.
     finding: z.string(),
-    track: z.enum(['local-probes', 'alignment-audits']),
+    track: z.enum(['local-probes', 'alignment-audits', 'live-systems']),
     date: z.coerce.date(),
     // Chart filename under /public/charts/ (optional; some experiments have none).
     chart: z.string().optional(),

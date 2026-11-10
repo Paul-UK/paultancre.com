@@ -37,6 +37,12 @@ export const TRACKS = {
       'Multi-turn adversarial audits (Inspect Petri) with LLM judges, probing ' +
       'safety and honesty behavior under controlled manipulations.',
   },
+  'live-systems': {
+    label: 'Live systems',
+    blurb:
+      'Post-mortems of systems I ran for real, outside the lab, with hosted ' +
+      'frontier models against live conditions. What the logs showed afterwards.',
+  },
 } as const;
 
 export type TrackKey = keyof typeof TRACKS;
