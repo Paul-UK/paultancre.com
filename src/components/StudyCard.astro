@@ -125,7 +125,19 @@ const haystack = [
     transition: color 0.2s ease;
   }
   .card:hover .body h3 { color: var(--accent); }
-  .finding { margin: 0; color: var(--ink-2); font-size: 0.9rem; line-height: 1.5; }
+  /* Findings run from one sentence to a full paragraph. Cards show the first
+     four lines; the whole text opens the post and stays in the search haystack. */
+  .finding {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+  }
   .foot {
     margin-top: auto;
     padding: 0.7rem 1.1rem 1rem;
