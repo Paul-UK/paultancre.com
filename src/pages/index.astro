@@ -54,9 +54,18 @@ const byTrack = trackKeys.map((key) => ({
         <h2>Latest</h2>
         <p>The newest experiments from all tracks.</p>
       </div>
-      <div class="grid">
-        {latest.map((study, i) => <StudyCard study={study} index={i} morph={false} />)}
-      </div>
+      {/* Titles only: each of these has its full card in its track below. */}
+      <ol class="latest-list reveal">
+        {latest.map((study) => (
+          <li>
+            <time class="mono" datetime={study.data.date.toISOString().slice(0, 10)}>
+              {study.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </time>
+            <a href={`/experiments/${study.id}/`}>{study.data.title}</a>
+            <span class="latest-track mono">{TRACKS[study.data.track].label}</span>
+          </li>
+        ))}
+      </ol>
     </section>
 
     {byTrack.map((track) => (
@@ -94,7 +103,7 @@ const byTrack = trackKeys.map((key) => ({
   let onHome = false;
 
   function init() {
-    // The Latest row repeats cards from the tracks, so search ignores it and
+    // The Latest list repeats posts from the tracks, so search ignores it and
     // hides it instead (via .searching) to avoid listing a match twice.
     const cards = Array.from(
       document.querySelectorAll<HTMLElement>('[data-track-section] .card')
@@ -181,6 +190,7 @@ const byTrack = trackKeys.map((key) => ({
   .noresults { margin: 0 0 1.5rem; color: var(--ink-3); }
 
   .track { margin-bottom: 4rem; }
+  .track.latest { margin-bottom: 3rem; }
   .track-head {
     border-top: 1px solid var(--border);
     padding-top: 1.4rem;
@@ -209,6 +219,29 @@ const byTrack = trackKeys.map((key) => ({
   .searching .more,
   :global(html:not(.js-ready)) .more,
   :global(html.no-js) .more { display: none; }
+
+  .latest-list { list-style: none; margin: 0; padding: 0; }
+  .latest-list li {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr auto;
+    gap: 0.2rem 1.2rem;
+    align-items: baseline;
+    padding: 0.7rem 0;
+  }
+  .latest-list li + li { border-top: 1px solid var(--border); }
+  .latest-list time, .latest-track { font-size: 0.72rem; color: var(--ink-3); white-space: nowrap; }
+  .latest-list a {
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    line-height: 1.3;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .latest-list a:hover { color: var(--accent); }
+  @media (max-width: 40rem) {
+    .latest-list li { grid-template-columns: 4.2rem 1fr; }
+    .latest-track { grid-column: 2; }
+  }
 
   .more {
     margin-top: 1.4rem;

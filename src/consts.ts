@@ -20,6 +20,9 @@ export const OG_IMAGE_ALT =
   'beside an amber step-change mark.';
 
 export const GITHUB_URL = 'https://github.com/Paul-UK';
+export const X_URL = 'https://x.com/PaulTancre';
+// Goes into the twitter:site / twitter:creator card tags.
+export const X_HANDLE = '@PaulTancre';
 // The published tooling behind the alignment-audit experiments.
 export const GITHUB_REPO_URL = 'https://github.com/Paul-UK/petri-braintrust';
 
